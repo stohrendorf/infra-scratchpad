@@ -73,8 +73,6 @@ dmypy.json
 .pyre/
 .pytype/
 cython_debug/
-.idea/
-!.idea/watcherTasks.xml
 cmake-build-*/
 *.iws
 out/
