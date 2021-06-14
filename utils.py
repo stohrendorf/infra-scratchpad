@@ -147,3 +147,48 @@ def char_idx(char: str) -> int:
     """
     assert len(char) == 1
     return ord(char) - ord("A") + 1
+
+
+def binary_decode(binary: str) -> str:
+    """
+    Decodes an 8-bit binary number.
+    :param binary: A binary string.
+    :return: The character representation.
+
+    >>> binary_decode("01010011")
+    'S'
+    """
+    assert len(binary) == 8 and all(c in ("0", "1") for c in binary)
+    return chr(sum(2 ** i for i, c in enumerate(reversed(binary)) if c == "1"))
+
+
+def binary_decode_multi(words: str) -> str:
+    """
+    Decodes a string of binary codes.
+    :param words: The binary codes.
+    :return: The decoded string.
+
+    >>> binary_decode_multi("01010011 01101111")
+    'So'
+    """
+    return "".join(map(binary_decode, words.split()))
+
+
+def binary_encode(string: str) -> Iterable[str]:
+    for c in map(ord, string):
+        yield "".join(str((c >> (7 - i)) & 1) for i in range(8))
+
+
+def insert_spaces(string: str, every: int) -> str:
+    """
+    Insert spaces at regular intervals.
+    :param string: The string to insert the spaces into.
+    :param every: The interval to insert spaces at.
+
+    >>> insert_spaces("ABCDEFGH", 3)
+    'ABC DEF GH'
+    """
+    return " ".join(
+        string[every * i : every * (i + 1)]
+        for i in range((len(string) + every - 1) // every)
+    )
