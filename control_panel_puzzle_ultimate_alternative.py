@@ -17,7 +17,7 @@ control_panel_puzzle_ultimate_column_selection: Tuple[
     Tuple[int, int, int, int, int], ...
 ] = (
     (0, 0, 1, 1, 1),
-    (1, 1, 0, 1, 0),
+    (1, 0, 0, 1, 0),
     (1, 1, 0, 1, 0),
     (1, 1, 1, 0, 1),
 )
