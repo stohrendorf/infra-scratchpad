@@ -1,4 +1,4 @@
-from typing import Iterable, Dict, Tuple, List
+from typing import Iterable, Dict, Tuple, List, TypeVar, Sequence, Union
 
 
 def all_string_indices(haystack: str, needle: str) -> Iterable[int]:
@@ -87,21 +87,24 @@ def rotate_column(data: Dict[str, str], column: int, n: int):
             prev = current
 
 
-def rotate_str_left(string: str, n: int) -> str:
-    """
-    Rotates a string.
-    :param string: The string to rotate.
-    :param n: The amount of rotation.
-    :return: The rotated string.
+T = TypeVar("T")
 
-    >>> rotate_str_left("hello", 2)
+
+def rotate_left(sequence: Union[Sequence[T], str], n: int) -> Union[Sequence[T], str]:
+    """
+    Rotates a sequence.
+    :param sequence: The sequence to rotate.
+    :param n: The amount of rotation.
+    :return: The rotated sequence.
+
+    >>> rotate_left("hello", 2)
     'llohe'
     """
-    return string[n:] + string[:n]
+    return sequence[n:] + sequence[:n]
 
 
-def rotate_str_right(string: str, n: int) -> str:
-    return rotate_str_left(string, len(string) - n)
+def rotate_right(sequence: Union[Sequence[T], str], n: int) -> Union[Sequence[T], str]:
+    return rotate_left(sequence, len(sequence) - n)
 
 
 def rotate_value(data: Dict[str, str], key: str, n: int):
@@ -116,7 +119,7 @@ def rotate_value(data: Dict[str, str], key: str, n: int):
     >>> data
     {'A': 'CDEB'}
     """
-    data[key] = rotate_str_left(data[key], n)
+    data[key] = rotate_left(data[key], n)
 
 
 def swap_columns(data: Dict[str, str], a: int, b: int):

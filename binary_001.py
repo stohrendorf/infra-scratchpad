@@ -1,4 +1,4 @@
-from utils import binary_decode_multi, rotate_str_right
+from utils import binary_decode_multi, rotate_right
 
 # these are the first 7 columns, as they repeat over the whole texture
 binary_001 = (
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     for prev, current in zip(all_decoded, all_decoded[1:] + all_decoded[:1]):
         assert len(prev) == len(current)
         for i in range(len(prev) + 1):
-            if rotate_str_right(prev, i) == current:
+            if rotate_right(prev, i) == current:
                 print(current, i)
                 break
         else:
