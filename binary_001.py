@@ -11,6 +11,8 @@ binary_001 = (
     "01001000 01000101 01010010 00100000 01010011 01001001 01000100 01000101 01001111 01010100",
 )
 
+binary_001_input = "OTHER SIDE"
+
 if __name__ == "__main__":
     all_decoded = tuple(map(binary_decode_multi, binary_001))
 
