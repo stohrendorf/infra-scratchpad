@@ -18,7 +18,13 @@ def all_string_indices(haystack: str, needle: str) -> Iterable[int]:
             break
 
 
-def find_char(data: Dict[str, str], char: str) -> Iterable[Tuple[str, int]]:
+TKey = TypeVar("TKey")
+TValue = TypeVar("TValue")
+T = TypeVar("T")
+Rotatable = Union[Sequence[T], str]
+
+
+def find_char(data: Dict[TKey, str], char: str) -> Iterable[Tuple[TKey, int]]:
     """
     Finds all indices of a given char in a dictionary of strings.
     :param data: The dictionary to search in.
@@ -35,22 +41,22 @@ def find_char(data: Dict[str, str], char: str) -> Iterable[Tuple[str, int]]:
             yield key, index + 1
 
 
-def find_string(
-    data: Dict[str, str], string: str
-) -> List[Tuple[str, List[Tuple[str, int]]]]:
+def find_string_chars(
+    data: Dict[TKey, str], string: str
+) -> List[Tuple[str, List[Tuple[TKey, int]]]]:
     """
     Finds all dictionary coordinates of the given string chars.
     :param data: The dictionary to search in.
     :param string: The string containing the chars to search for.
     :return: A list of tuples, each tuple containing the char and the corresponding list of coordinates.
 
-    >>> list(find_string({"A": "BC"}, "CD"))
+    >>> list(find_string_chars({"A": "BC"}, "CD"))
     [('C', [('A', 2)]), ('D', [])]
     """
     return [(char, list(find_char(data, char))) for char in string]
 
 
-def swap_values(data: Dict[str, str], a: str, b: str):
+def swap_values(data: Dict[TKey, TValue], a: TKey, b: TKey):
     """
     Swaps the values in a dictionary.
     :param data: The dictionary to modify.
@@ -65,7 +71,7 @@ def swap_values(data: Dict[str, str], a: str, b: str):
     data[a], data[b] = data[b], data[a]
 
 
-def rotate_column(data: Dict[str, str], column: int, n: int):
+def rotate_column(data: Dict[TKey, Rotatable], column: int, n: int):
     """
     Rotates a column in a dictionary.
     :param data: The dictionary.
@@ -87,10 +93,6 @@ def rotate_column(data: Dict[str, str], column: int, n: int):
             prev = current
 
 
-T = TypeVar("T")
-Rotatable = Union[Sequence[T], str]
-
-
 def rotate_left(sequence: Rotatable, n: int) -> Rotatable:
     """
     Rotates a sequence.
@@ -108,7 +110,7 @@ def rotate_right(sequence: Rotatable, n: int) -> Rotatable:
     return rotate_left(sequence, len(sequence) - n)
 
 
-def rotate_value(data: Dict[str, str], key: str, n: int):
+def rotate_value(data: Dict[TKey, Rotatable], key: TKey, n: int):
     """
     Rotates a value in a dictionary.
     :param data: The dictionary to modify.
@@ -123,7 +125,7 @@ def rotate_value(data: Dict[str, str], key: str, n: int):
     data[key] = rotate_left(data[key], n)
 
 
-def swap_columns(data: Dict[str, str], a: int, b: int):
+def swap_columns(data: Dict[TKey, Rotatable], a: int, b: int):
     """
     Swap two columns of a dictionary.
     :param data: The dictionary to modify.

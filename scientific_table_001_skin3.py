@@ -4,7 +4,7 @@ Stuff related to https://stalburg.net/Letter_box
 
 from typing import Tuple, Dict
 
-from utils import find_string
+from utils import find_string_chars
 
 scientific_table_001_skin3 = {
     # G3 is G0 in the texture, it's different here to avoid special handling with coordinates
@@ -22,7 +22,7 @@ scientific_table_001_skin3 = {
 
 def print_string_code(string: str):
     print(f"{string=}")
-    for char, codes in find_string(scientific_table_001_skin3, string):
+    for char, codes in find_string_chars(scientific_table_001_skin3, string):
         code_str = ", ".join(f"{row}:{col}" for row, col in codes)
         print(char, code_str)
 
