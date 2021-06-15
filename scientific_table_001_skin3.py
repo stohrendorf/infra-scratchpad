@@ -6,7 +6,8 @@ from typing import Tuple, Dict
 
 from utils import find_string
 
-rag_data = {
+scientific_table_001_skin3 = {
+    # G3 is G0 in the texture, it's different here to avoid special handling with coordinates
     "G3": "EQGREIHYEWHKUTOPKTTHISNOBER",
     "G4": "BXRAPRLGGBDJETEAUEVQIYSNEGE",
     "G5": "UHXTEMGLJFQTMPKRLSFERGEJROD",
@@ -21,7 +22,7 @@ rag_data = {
 
 def print_string_code(string: str):
     print(f"{string=}")
-    for char, codes in find_string(rag_data, string):
+    for char, codes in find_string(scientific_table_001_skin3, string):
         code_str = ", ".join(f"{row}:{col}" for row, col in codes)
         print(char, code_str)
 
@@ -59,4 +60,4 @@ def solve_g1_g2_g3(data: Dict[str, str]):
 
 
 if __name__ == "__main__":
-    solve_g1_g2_g3(rag_data)
+    solve_g1_g2_g3(scientific_table_001_skin3)

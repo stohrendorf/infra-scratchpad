@@ -1,14 +1,14 @@
 from collections import defaultdict
 from typing import Dict, Tuple
 
-wasteland_key = {
+wasteland_notes_001_key = {
     "A": "OTHERSIDE",
     "R": "ALBERTHARTMAN",
     "Q": "WHATCONNECTSALLTHESE",
     "T": "IFYOUKNOWITJUSTSAYITTHENYOUGETI?REDRAVEN",
 }
 
-wasteland_notes = (
+wasteland_notes_001 = (
     "A.1 Q.4 A.3 A.9 A.5 A.6 A.7 A.8 A.9 Q.7 Q.6 Q.16 A.1 Q.4 A.3 A.9 A.5 Q.1 Q.6 A.5 Q.14 A.8",
     "YOU CAN R.7 R.4 R.8 R.9 R.6 R.7 R.4 R.11 R.3 R.5 R.4 R.8 R.6 R.7 A.7 R.13 T.28 WHERE THEY DIED",
     "R.5 R.12 T.38 R.4 R.13 T.2 A.1 T.13 T.24 A.8 A.7 A.2",
@@ -84,6 +84,6 @@ def clean_unreferenced_key_chars(
 
 
 if __name__ == "__main__":
-    for note in wasteland_notes:
-        print(decode_wasteland_message(wasteland_key, note))
-    print(clean_unreferenced_key_chars(wasteland_key, wasteland_notes))
+    for note in wasteland_notes_001:
+        print(decode_wasteland_message(wasteland_notes_001_key, note))
+    print(clean_unreferenced_key_chars(wasteland_notes_001_key, wasteland_notes_001))

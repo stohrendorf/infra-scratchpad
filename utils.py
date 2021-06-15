@@ -88,9 +88,10 @@ def rotate_column(data: Dict[str, str], column: int, n: int):
 
 
 T = TypeVar("T")
+Rotatable = Union[Sequence[T], str]
 
 
-def rotate_left(sequence: Union[Sequence[T], str], n: int) -> Union[Sequence[T], str]:
+def rotate_left(sequence: Rotatable, n: int) -> Rotatable:
     """
     Rotates a sequence.
     :param sequence: The sequence to rotate.
@@ -103,7 +104,7 @@ def rotate_left(sequence: Union[Sequence[T], str], n: int) -> Union[Sequence[T],
     return sequence[n:] + sequence[:n]
 
 
-def rotate_right(sequence: Union[Sequence[T], str], n: int) -> Union[Sequence[T], str]:
+def rotate_right(sequence: Rotatable, n: int) -> Rotatable:
     return rotate_left(sequence, len(sequence) - n)
 
 

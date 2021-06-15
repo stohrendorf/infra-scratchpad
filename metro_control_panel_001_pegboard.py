@@ -2,7 +2,7 @@ from typing import Tuple
 
 Pegs = Tuple[Tuple[str, str], ...]
 
-pegboard: Pegs = (
+metro_control_panel_001_pegboard: Pegs = (
     # panel 1
     ("MPMEEMPMPMEEEMPMPMPEEEMP", "PMPMPPEPEEEEEEEEMPMPMPMP"),
     # panel 2
