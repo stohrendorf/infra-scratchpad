@@ -1,39 +1,31 @@
-from utils import binary_decode_multi
+from utils import binary_decode_multi, rotate_str_right
+
+# these are the first 7 columns, as they repeat over the whole texture
+binary_001 = (
+    "01010010 00100000 01010011 01001001 01000100 01000101 01001111 01010100 01001000 01000101",
+    "01010100 01001000 01000101 01010010 00100000 01010011 01001001 01000100 01000101 01001111",
+    "01000101 01001111 01010100 01001000 01000101 01010010 00100000 01010011 01001001 01000100",
+    "01010011 01001001 01000100 01000101 01001111 01010100 01001000 01000101 01010010 00100000",
+    "01010010 00100000 01010011 01001001 01000100 01000101 01001111 01010100 01001000 01000101",
+    "01001111 01010100 01001000 01000101 01010010 00100000 01010011 01001001 01000100 01000101",
+    "01001000 01000101 01010010 00100000 01010011 01001001 01000100 01000101 01001111 01010100",
+)
 
 if __name__ == "__main__":
-    # these are the first 7 columns, as they repeat over the whole texture
-    print(
-        binary_decode_multi(
-            "01010010 00100000 01010011 01001001 01000100 01000101 01001111 01010100 01001000 01000101"
-        )
-    )
-    print(
-        binary_decode_multi(
-            "01010100 01001000 01000101 01010010 00100000 01010011 01001001 01000100 01000101 01001111"
-        )
-    )
-    print(
-        binary_decode_multi(
-            "01000101 01001111 01010100 01001000 01000101 01010010 00100000 01010011 01001001 01000100"
-        )
-    )
-    print(
-        binary_decode_multi(
-            "01010011 01001001 01000100 01000101 01001111 01010100 01001000 01000101 01010010 00100000"
-        )
-    )
-    print(
-        binary_decode_multi(
-            "01010010 00100000 01010011 01001001 01000100 01000101 01001111 01010100 01001000 01000101"
-        )
-    )
-    print(
-        binary_decode_multi(
-            "01001111 01010100 01001000 01000101 01010010 00100000 01010011 01001001 01000100 01000101"
-        )
-    )
-    print(
-        binary_decode_multi(
-            "01001000 01000101 01010010 00100000 01010011 01001001 01000100 01000101 01001111 01010100"
-        )
-    )
+    all_decoded = tuple(map(binary_decode_multi, binary_001))
+
+    for column in all_decoded:
+        print(column)
+
+    print()
+
+    print("amount of right rotations from previous column")
+    print(all_decoded[0])
+    for prev, current in zip(all_decoded, all_decoded[1:] + all_decoded[:1]):
+        assert len(prev) == len(current)
+        for i in range(len(prev) + 1):
+            if rotate_str_right(prev, i) == current:
+                print(current, i)
+                break
+        else:
+            raise RuntimeError
