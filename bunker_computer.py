@@ -38,6 +38,9 @@ bunker_computer_code_2 = (
     "H4.5",
 )
 
+# This is the patched solution with A3.2=C
+bunker_computer_code_2_solution = "WHATCONNECTSALLTHESE"
+
 bunker_computer_code_3 = (
     "1.3",
     "1.1",
@@ -91,6 +94,9 @@ def decrypt_bunker_computer_code_2() -> str:
             return f"[{code}]"
 
     return "".join(decode_single(code) for code in bunker_computer_code_2)
+
+
+bunker_computer_code_2_solution_unpatched = decrypt_bunker_computer_code_2()
 
 
 def get_code_3_usage() -> Dict[str, int]:
