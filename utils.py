@@ -202,3 +202,21 @@ def insert_spaces(string: str, every: int) -> str:
         string[every * i : every * (i + 1)]
         for i in range((len(string) + every - 1) // every)
     )
+
+
+def convert_base(value: int, base: int) -> Iterable[int]:
+    """
+    Express a number with a specific base.
+    :param value: The number to be expressed with a different base.
+    :param base: The new base.
+    :return: The "digits", starting with the lowest exponent.
+
+    >>> tuple(convert_base(0x6, 2))
+    (0, 1, 1)
+    >>> tuple(convert_base(0xf, 10))
+    (5, 1)
+    """
+    assert base > 0
+    while value != 0:
+        yield value % base
+        value //= base
