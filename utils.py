@@ -169,7 +169,12 @@ def binary_decode(binary: str) -> str:
     'S'
     """
     assert len(binary) == 8 and all(c in ("0", "1") for c in binary)
-    return chr(sum(2 ** i for i, c in enumerate(reversed(binary)) if c == "1"))
+    return chr(int(binary, 2))
+
+
+def invert_bits(binary: str) -> str:
+    assert all(c in ("0", "1") for c in binary)
+    return "".join(str(1 - int(c)) for c in binary)
 
 
 def binary_decode_multi(words: str) -> str:

@@ -26,7 +26,7 @@ if __name__ == "__main__":
         rotate_right(
             [
                 rotate_right(binary_decode_multi(binary), rotation)
-                for binary, rotation in reversed(computer_screen_skin8)
+                for binary, rotation in computer_screen_skin8[::-1]
             ],
             5,
         )
