@@ -53,7 +53,7 @@ def decode(data: Dict[str, str], *coords: Tuple[int, int, int]) -> str:
     return result
 
 
-def solve_g1_g2_g3(data: Dict[str, str]):
+def solve_g1_g2_g3() -> Dict[str, str]:
     def decode_reference(reference: Sequence[str]) -> Iterable[Tuple[int, int, int]]:
         assert len(reference) % 5 == 0
         for i in range(0, len(reference), 5):
@@ -70,10 +70,12 @@ def solve_g1_g2_g3(data: Dict[str, str]):
     g2 = "X,Y,1,4,7,X,Y,2,9,3,X,Y,4,7,6,X,Y,5,11,7,X,Y,6,4,9".split(",")
     g3 = "X,Y,2,5,3,X,Y,1,4,5,X,Y,3,7,4,X,Y,4,8,5".split(",")
 
-    print("G1", decode(data, *decode_reference(g1)))
-    print("G2", decode(data, *decode_reference(g2)))
-    print("G3", decode(data, *decode_reference(g3)))
+    return {
+        "G1": decode(scientific_table_001_skin3, *decode_reference(g1)),
+        "G2": decode(scientific_table_001_skin3, *decode_reference(g2)),
+        "G3": decode(scientific_table_001_skin3, *decode_reference(g3)),
+    }
 
 
 if __name__ == "__main__":
-    solve_g1_g2_g3(scientific_table_001_skin3)
+    solve_g1_g2_g3()

@@ -1,5 +1,7 @@
 from typing import Dict, Tuple
 
+from scientific_table_001_skin3 import solve_g1_g2_g3
+
 body_code = {
     "A1": "WHAT",
     "A2": "HAPPENED",
@@ -14,9 +16,7 @@ body_code = {
     "E1": "IS",
     "F2": "TRUTH",
     "F4": "ANSWER",
-    "G1": "RIGHT",
-    "G2": "PERSON",
-    "G3": "TELL",
+    **solve_g1_g2_g3(),
 }
 
 body_message = (
