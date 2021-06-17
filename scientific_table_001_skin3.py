@@ -2,7 +2,7 @@
 Stuff related to https://stalburg.net/Letter_box
 """
 
-from typing import Tuple, Dict
+from typing import Tuple, Dict, Sequence, Iterable
 
 from utils import find_string_chars
 
@@ -43,9 +43,9 @@ def decode(data: Dict[str, str], *coords: Tuple[int, int, int]) -> str:
         idx - 1: data[f"G{row}"][col - 1] if f"G{row}" in data else "?"
         for idx, col, row in coords
     }
-    max_idx = max(co[0] - 1 for co in coords)
+    max_idx = max(co[0] for co in coords)
     result = ""
-    for i in range(max_idx + 1):
+    for i in range(max_idx):
         if i not in decoded:
             result += "?"
         else:
@@ -54,9 +54,25 @@ def decode(data: Dict[str, str], *coords: Tuple[int, int, int]) -> str:
 
 
 def solve_g1_g2_g3(data: Dict[str, str]):
-    print("G1", decode(data, (1, 3, 4), (2, 6, 6), (3, 7, 5), (4, 10, 6), (5, 12, 8)))
-    print("G2", decode(data, (1, 4, 7), (2, 9, 3), (4, 7, 6), (5, 11, 7), (6, 4, 9)))
-    print("G3", decode(data, (2, 5, 3), (1, 4, 5), (3, 7, 4), (4, 8, 5)))
+    def decode_reference(reference: Sequence[str]) -> Iterable[Tuple[int, int, int]]:
+        assert len(reference) % 5 == 0
+        for i in range(0, len(reference), 5):
+            x, y, index, x_co, y_co = reference[i : i + 5]
+            if x == "Y":
+                x, y = y, x
+                x_co, y_co = y_co, x_co
+
+            assert (x, y) == ("X", "Y")
+
+            yield int(index), int(x_co), int(y_co)
+
+    g1 = "X,Y,1,3,4,X,Y,2,6,6,Y,X,3,5,7,X,Y,4,10,6,X,Y,5,12,8".split(",")
+    g2 = "X,Y,1,4,7,X,Y,2,9,3,X,Y,4,7,6,X,Y,5,11,7,X,Y,6,4,9".split(",")
+    g3 = "X,Y,2,5,3,X,Y,1,4,5,X,Y,3,7,4,X,Y,4,8,5".split(",")
+
+    print("G1", decode(data, *decode_reference(g1)))
+    print("G2", decode(data, *decode_reference(g2)))
+    print("G3", decode(data, *decode_reference(g3)))
 
 
 if __name__ == "__main__":
