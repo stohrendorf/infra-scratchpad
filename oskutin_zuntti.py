@@ -18,6 +18,7 @@ def riddle2():
         " 10001101 10011110 10010001 10011010 10011110 10010001 1110101 10001101 10011010 10011011 10010000 10001010"
         " 10011101 10001011 1110101 10001110 10001010 10011110 10001101 10001101 10000110"
     )
+    # for whatever reason, the encoded \n's are missing a leading 1
     print("".join(chr(0xFF ^ int(byte.rjust(8, "1"), 2)) for byte in code.split()))
 
 
