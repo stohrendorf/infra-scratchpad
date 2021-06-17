@@ -12,7 +12,7 @@ control_panel_puzzle_ultimate_alternative: Tuple[Column, Column, Column, Column]
     (("I", "Q"), (12, "U"), (14, "E"), ("S", "I"), (9, "T")),
 )
 
-# this only one of the solutions, the other one is found by using the values not used in this solution
+# this is only one of the solutions, the other one is found by using the values not used in this solution
 control_panel_puzzle_ultimate_column_selection: Tuple[
     Tuple[int, int, int, int, int], ...
 ] = (
