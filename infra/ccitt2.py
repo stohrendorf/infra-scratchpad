@@ -1,6 +1,6 @@
 from typing import Iterable
 
-ccit2_table = {
+ccitt2_table = {
     0b00011: ("A", "-"),
     0b11001: ("B", "?"),
     0b01110: ("C", ":"),
@@ -33,42 +33,50 @@ ccit2_table = {
     0b00000: ("[unused]", "[unused]"),
 }
 
-ccit2_table_encode_letters = {letter: code for code, (letter, _) in ccit2_table.items()}
-ccit2_table_encode_symbols = {symbol: code for code, (_, symbol) in ccit2_table.items()}
-ccit2_table_decode_letters = {code: letter for code, (letter, _) in ccit2_table.items()}
-ccit2_table_decode_symbols = {code: symbol for code, (_, symbol) in ccit2_table.items()}
+ccitt2_table_encode_letters = {
+    letter: code for code, (letter, _) in ccitt2_table.items()
+}
+ccitt2_table_encode_symbols = {
+    symbol: code for code, (_, symbol) in ccitt2_table.items()
+}
+ccitt2_table_decode_letters = {
+    code: letter for code, (letter, _) in ccitt2_table.items()
+}
+ccitt2_table_decode_symbols = {
+    code: symbol for code, (_, symbol) in ccitt2_table.items()
+}
 
-ccit2_select_letters = 0b11111
-ccit2_select_symbols = 0b11011
+ccitt2_select_letters = 0b11111
+ccitt2_select_symbols = 0b11011
 
 
-def ccit2_encode(input: str) -> Iterable[int]:
+def ccitt2_encode(input: str) -> Iterable[int]:
     mode_letters = True
-    current_table = ccit2_table_encode_letters
+    current_table = ccitt2_table_encode_letters
     for char in input:
         current = current_table.get(char)
         if current is None:
             current_table = (
-                ccit2_table_encode_symbols
+                ccitt2_table_encode_symbols
                 if mode_letters
-                else ccit2_table_encode_letters
+                else ccitt2_table_encode_letters
             )
             mode_letters = not mode_letters
             current = current_table[char]
-            yield ccit2_select_letters if mode_letters else ccit2_select_symbols
+            yield ccitt2_select_letters if mode_letters else ccitt2_select_symbols
         yield current
 
 
-def ccit2_decode(input: Iterable[int]) -> str:
-    current_table = ccit2_table_decode_letters
+def ccitt2_decode(input: Iterable[int]) -> str:
+    current_table = ccitt2_table_decode_letters
 
     decoded = ""
     for value in input:
-        if value == ccit2_select_letters:
-            current_table = ccit2_table_decode_letters
+        if value == ccitt2_select_letters:
+            current_table = ccitt2_table_decode_letters
             continue
-        elif value == ccit2_select_symbols:
-            current_table = ccit2_table_decode_symbols
+        elif value == ccitt2_select_symbols:
+            current_table = ccitt2_table_decode_symbols
             continue
         current = current_table[value]
         decoded += current
