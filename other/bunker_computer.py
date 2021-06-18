@@ -1,6 +1,6 @@
 from typing import Dict, Tuple
 
-from .body_message import body_code
+from other.body_message import body_code
 
 bunker_computer_code_1 = (
     ("Underground", "Trees", "Lead", "Message"),

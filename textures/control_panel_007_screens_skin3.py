@@ -1,4 +1,4 @@
-from infra.utils import binary_decode_multi
+from infra.binary import binary_decode_multi
 
 control_panel_007_screens_skin3 = (
     "01010011 01101111 01101101 01100101 01110100 01101000",

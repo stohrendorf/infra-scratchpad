@@ -1,4 +1,5 @@
-from infra.utils import binary_decode_multi, rotate_right
+from infra.utils import rotate_right
+from infra.binary import binary_decode_multi
 
 # codes start with the first complete code, the last one is usually wrapped
 computer_screen_skin8 = (

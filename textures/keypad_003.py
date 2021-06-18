@@ -1,4 +1,4 @@
-from infra.utils import binary_decode_multi
+from infra.binary import binary_decode_multi
 
 keypad_003 = (
     "01001110 01001111 01010100",

@@ -1,4 +1,5 @@
-from infra.utils import binary_decode_multi, rotate_right
+from infra.utils import rotate_right
+from infra.binary import binary_decode_multi
 
 # these are the first 7 columns, as they repeat over the whole texture
 binary_001 = (

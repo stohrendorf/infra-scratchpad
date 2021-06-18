@@ -1,4 +1,4 @@
-from infra.utils import binary_decode_multi
+from infra.binary import binary_decode_multi
 
 sign_07_skin10 = (
     "01110000 01110101",
