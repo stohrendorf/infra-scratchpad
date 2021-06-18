@@ -26,7 +26,7 @@ control_panel_puzzle_ultimate_column_selection: Tuple[
 def decrypt_control_panel_puzzle_ultimate_column_selection(
     alternative: bool,
 ) -> Tuple[str, ...]:
-    def get_decrypted_value(value: PlateValue) -> str:
+    def decrypt_value(value: PlateValue) -> str:
         return (
             value
             if isinstance(value, str)
@@ -35,7 +35,7 @@ def decrypt_control_panel_puzzle_ultimate_column_selection(
 
     return tuple(
         "".join(
-            get_decrypted_value(value)
+            decrypt_value(value)
             for value in (
                 plate[value_selection]
                 if not alternative

@@ -18,6 +18,7 @@ def print_pegs(pegs: Pegs):
 
 
 def remove_empty(pegs: Pegs) -> Pegs:
+    # noinspection PyTypeChecker
     return tuple(tuple(s.replace("E", "") for s in panel) for panel in pegs)
 
 
@@ -25,6 +26,7 @@ def swap_pegs(pegs: Pegs, a: str, b: str) -> Pegs:
     assert len(a) == 1 and len(b) == 1
 
     placeholder = "_"
+    # noinspection PyTypeChecker
     return tuple(
         tuple(
             s.replace(a, placeholder).replace(b, a).replace(placeholder, b)

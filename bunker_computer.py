@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 from body_message import body_code
 
@@ -86,21 +86,25 @@ bunker_computer_code_3 = (
 
 
 def decrypt_bunker_computer_code_2() -> str:
-    def decode_single(code: str) -> str:
+    def decrypt_letter(code: str) -> str:
         body_code_key, letter = code.split(".")
         try:
             return body_code[body_code_key][int(letter) - 1]
         except KeyError:
             return f"[{code}]"
 
-    return "".join(decode_single(code) for code in bunker_computer_code_2)
+    return "".join(decrypt_letter(code) for code in bunker_computer_code_2)
 
 
 bunker_computer_code_2_solution_unpatched = decrypt_bunker_computer_code_2()
 
 
-def get_code_3_usage() -> Dict[str, int]:
-    result = {f"{x + 1}.{y + 1}": 0 for x in range(4) for y in range(10)}
+def count_usages(data: Tuple[Tuple[str, ...], ...]) -> Dict[str, int]:
+    result = {
+        f"{x + 1}.{y + 1}": 0
+        for y, y_data in enumerate(data)
+        for x in range(len(y_data))
+    }
     for code in bunker_computer_code_3:
         result[code] += 1
 
@@ -108,7 +112,7 @@ def get_code_3_usage() -> Dict[str, int]:
 
 
 def print_non_unique_code_usage_part_3():
-    for code, usage_count in get_code_3_usage().items():
+    for code, usage_count in count_usages(bunker_computer_code_1).items():
         if usage_count != 1:
             column, row = code.split(".")
             print(
