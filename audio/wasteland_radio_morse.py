@@ -1,4 +1,4 @@
-from morse import decode_morse
+from infra.morse import decode_morse
 
 wasteland_radio_morse = (
     ".-. .- ...- . -. .-.-.- # --- - .... . .-."

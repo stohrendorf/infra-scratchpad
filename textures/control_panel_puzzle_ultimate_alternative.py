@@ -1,6 +1,6 @@
 from typing import Tuple, Union
 
-from bunker_computer import bunker_computer_code_2_solution
+from other.bunker_computer import bunker_computer_code_2_solution
 
 PlateValue = Union[str, int]
 Plate = Tuple[PlateValue, PlateValue]

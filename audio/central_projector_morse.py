@@ -1,4 +1,4 @@
-from morse import decode_morse
+from infra.morse import decode_morse
 
 central_projector_morse = (
     "-.-- --- ..- # -.-. .- -. # -. --- - # ..-. .. -. -.. # .-. .. --. .... - # .- -. ... .-- . .-. --- .-. # - .... ."

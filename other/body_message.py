@@ -1,6 +1,6 @@
 from typing import Dict, Tuple
 
-from scientific_table_001_skin3 import solve_g1_g2_g3
+from textures.scientific_table_001_skin3 import solve_g1_g2_g3
 
 body_code = {
     "A1": "WHAT",

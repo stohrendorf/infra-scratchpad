@@ -1,8 +1,8 @@
 from collections import defaultdict
 from typing import Dict, Tuple
 
-from bunker_computer import bunker_computer_code_2_solution
-from hartman_woodbox import hartman_woodbox_002_solution
+from other.bunker_computer import bunker_computer_code_2_solution
+from textures.hartman_woodbox import hartman_woodbox_002_solution
 
 wasteland_notes_001_key = {
     "A": "OTHERSIDE",

@@ -1,4 +1,4 @@
-from utils import convert_base, binary_decode_multi, invert_bits, binary_decode
+from infra.utils import convert_base, invert_bits, binary_decode
 
 
 def riddle1():

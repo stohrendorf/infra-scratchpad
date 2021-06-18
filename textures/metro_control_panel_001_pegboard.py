@@ -4,7 +4,7 @@ Pegs = Tuple[Tuple[str, str], ...]
 
 metro_control_panel_001_pegboard: Pegs = (
     # panel 1
-    ("MPMEEMPMPMEEEMPMPMPEEEMP", "PMPMPPEPEEEEEEEEMPMPMPMP"),
+    ("3MPMEEMPMPMEEEMPMPMPEEEMP", "PMPMPPEPEEEEEEEEMPMPMPMP"),
     # panel 2
     ("MPMPMPEEEEMPMPEEEEMPMPMP", "PMPMPMPMEEEMEMPEPMPMPMPM"),
     # panel 4

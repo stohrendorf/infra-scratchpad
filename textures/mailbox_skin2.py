@@ -1,4 +1,4 @@
-from utils import binary_decode_multi, insert_spaces
+from infra.utils import binary_decode_multi, insert_spaces
 
 mailbox_skin2 = (
     "0111010001101000011001010010000001110100",

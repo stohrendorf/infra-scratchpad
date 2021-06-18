@@ -4,7 +4,7 @@ Stuff related to https://stalburg.net/Letter_box
 
 from typing import Tuple, Dict, Sequence, Iterable
 
-from utils import find_string_chars
+from infra.utils import find_string_chars
 
 scientific_table_001_skin3 = {
     # G3 is G0 in the texture, it's different here to avoid special handling with coordinates
