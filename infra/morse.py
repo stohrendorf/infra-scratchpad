@@ -41,6 +41,7 @@ morse = {
     "----.": "9",
     "-----": "0",
     ".-.-.-": ".",
+    "---...": ":",
 }
 
 assert len(set(morse.values())) == len(morse), f"Morse code mappings are not unique"
