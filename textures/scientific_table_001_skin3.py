@@ -78,4 +78,5 @@ def solve_g1_g2_g3() -> Dict[str, str]:
 
 
 if __name__ == "__main__":
-    solve_g1_g2_g3()
+    for key, value in solve_g1_g2_g3().items():
+        print(key, value)
