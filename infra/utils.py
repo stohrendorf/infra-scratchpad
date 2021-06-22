@@ -1,9 +1,10 @@
 """Utility functions."""
 
-from typing import Iterable, Sequence, TypeVar, Union
+from typing import Iterable, List, Sequence, Tuple, TypeVar, Union
 
 T = TypeVar("T")
 Rotatable = Union[Sequence[T], str]
+Indexable = Union[List[T], Union[T], str]
 
 
 def rotate_left(sequence: Rotatable, n: int) -> Rotatable:
@@ -51,3 +52,17 @@ def convert_base(value: int, base: int) -> Iterable[int]:
     while value != 0:
         yield value % base
         value //= base
+
+
+def split_every(data: Indexable, every: int) -> Tuple[Indexable]:
+    """
+    Split data into groups of a given maximum length.
+
+    :param data: The data to split.
+    :param every: The maximum length of the resulting sequences.
+    :return: The split sequences.
+
+    >>> split_every("ABCDE", 2)
+    ('AB', 'CD', 'E')
+    """
+    return tuple(data[every * i : every * (i + 1)] for i in range((len(data) + every - 1) // every))

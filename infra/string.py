@@ -2,6 +2,8 @@
 
 from typing import Iterable
 
+from infra.utils import split_every
+
 
 def all_string_indices(haystack: str, needle: str) -> Iterable[int]:
     """
@@ -45,4 +47,4 @@ def insert_spaces(string: str, every: int) -> str:
     >>> insert_spaces("ABCDEFGH", 3)
     'ABC DEF GH'
     """
-    return " ".join(string[every * i : every * (i + 1)] for i in range((len(string) + every - 1) // every))
+    return " ".join(split_every(string, every))
