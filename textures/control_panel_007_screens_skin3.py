@@ -1,3 +1,5 @@
+"""The solution for the code found in control_panel_007_screens_skin3.vtf."""
+
 from infra.binary import binary_decode_multi
 
 control_panel_007_screens_skin3 = (

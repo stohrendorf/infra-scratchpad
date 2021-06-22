@@ -1,4 +1,6 @@
-from typing import Iterable, TypeVar, Sequence, Union
+"""Utility functions."""
+
+from typing import Iterable, Sequence, TypeVar, Union
 
 T = TypeVar("T")
 Rotatable = Union[Sequence[T], str]
@@ -6,7 +8,8 @@ Rotatable = Union[Sequence[T], str]
 
 def rotate_left(sequence: Rotatable, n: int) -> Rotatable:
     """
-    Rotates a sequence.
+    Rotate a sequence to the left.
+
     :param sequence: The sequence to rotate.
     :param n: The amount of rotation.
     :return: The rotated sequence.
@@ -18,12 +21,23 @@ def rotate_left(sequence: Rotatable, n: int) -> Rotatable:
 
 
 def rotate_right(sequence: Rotatable, n: int) -> Rotatable:
+    """
+    Rotate a sequence to the right.
+
+    :param sequence: The sequence to rotate.
+    :param n: The amount of rotation.
+    :return: The rotated sequence.
+
+    >>> rotate_right("hello", 2)
+    'lohel'
+    """
     return rotate_left(sequence, len(sequence) - n)
 
 
 def convert_base(value: int, base: int) -> Iterable[int]:
     """
     Express a number with a specific base.
+
     :param value: The number to be expressed with a different base.
     :param base: The new base.
     :return: The "digits", starting with the lowest exponent.

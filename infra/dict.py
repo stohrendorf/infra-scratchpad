@@ -1,4 +1,6 @@
-from typing import Dict, Iterable, Tuple, TypeVar, List
+"""Functions related to scanning and modifying dicts."""
+
+from typing import Dict, Iterable, List, Tuple, TypeVar
 
 from infra.string import all_string_indices
 from infra.utils import Rotatable, rotate_left
@@ -9,26 +11,26 @@ TValue = TypeVar("TValue")
 
 def find_char(data: Dict[TKey, str], char: str) -> Iterable[Tuple[TKey, int]]:
     """
-    Finds all indices of a given char in a dictionary of strings.
+    Find all indices of a given char in a dictionary of strings.
+
     :param data: The dictionary to search in.
     :param char: The char to search for.
-    :return: An iterable of tuples containing the dictionary key and the indices of the char in the corresponding dictionary values.
+    :return: An iterable of tuples containing the dictionary key and the indices of the char in the corresponding
+             dictionary values.
 
     >>> list(find_char({"A": "BC"}, "C"))
     [('A', 2)]
     """
-
     assert len(char) == 1
     for key, values in data.items():
         for index in all_string_indices(values, char):
             yield key, index + 1
 
 
-def find_string_chars(
-    data: Dict[TKey, str], string: str
-) -> List[Tuple[str, List[Tuple[TKey, int]]]]:
+def find_string_chars(data: Dict[TKey, str], string: str) -> List[Tuple[str, List[Tuple[TKey, int]]]]:
     """
-    Finds all dictionary coordinates of the given string chars.
+    Find all dictionary coordinates of the given string chars.
+
     :param data: The dictionary to search in.
     :param string: The string containing the chars to search for.
     :return: A list of tuples, each tuple containing the char and the corresponding list of coordinates.
@@ -41,7 +43,8 @@ def find_string_chars(
 
 def swap_values(data: Dict[TKey, TValue], a: TKey, b: TKey):
     """
-    Swaps the values in a dictionary.
+    Swap the values in a dictionary.
+
     :param data: The dictionary to modify.
     :param a: The first key to swap.
     :param b: The second key to swap.
@@ -56,7 +59,8 @@ def swap_values(data: Dict[TKey, TValue], a: TKey, b: TKey):
 
 def rotate_column(data: Dict[TKey, Rotatable], column: int, n: int):
     """
-    Rotates a column in a dictionary.
+    Rotate a column in a dictionary.
+
     :param data: The dictionary.
     :param column: The column to rotate.
     :param n: The amount of rotation.
@@ -78,7 +82,8 @@ def rotate_column(data: Dict[TKey, Rotatable], column: int, n: int):
 
 def rotate_value_left(data: Dict[TKey, Rotatable], key: TKey, n: int):
     """
-    Rotates a value in a dictionary.
+    Rotate a value in a dictionary.
+
     :param data: The dictionary to modify.
     :param key: The key to rotate the value of.
     :param n: The amount of rotation
@@ -94,6 +99,7 @@ def rotate_value_left(data: Dict[TKey, Rotatable], key: TKey, n: int):
 def swap_columns(data: Dict[TKey, Rotatable], a: int, b: int):
     """
     Swap two columns of a dictionary.
+
     :param data: The dictionary to modify.
     :param a: The first column.
     :param b: The second column.

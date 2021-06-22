@@ -1,8 +1,6 @@
-"""
-Stuff related to https://stalburg.net/Letter_box
-"""
+"""Stuff related to https://stalburg.net/Letter_box."""
 
-from typing import Tuple, Dict, Sequence, Iterable
+from typing import Dict, Iterable, Sequence, Tuple
 
 from infra.dict import find_string_chars
 
@@ -20,29 +18,27 @@ scientific_table_001_skin3 = {
 }
 
 
-def print_string_code(string: str):
+def _print_string_code(string: str):
     print(f"{string=}")
     for char, codes in find_string_chars(scientific_table_001_skin3, string):
         code_str = ", ".join(f"{row}:{col}" for row, col in codes)
         print(char, code_str)
 
 
-def print_rag(data: Dict[str, str]):
+def _print_rag(data: Dict[str, str]):
     for key, values in data.items():
         print(key, values)
 
 
 def decode(data: Dict[str, str], *coords: Tuple[int, int, int]) -> str:
     """
-    The decryption algorithm used in https://stalburg.net/Letter_box.
+    Decrypt using the algorithm described in https://stalburg.net/Letter_box.
+
     :param data: The reference dictionary.
     :param coords: A list of tuples containing the =, X and Y coordinates.
     :return: The decoded string, with unknown values replaced with a "?".
     """
-    decoded = {
-        idx - 1: data[f"G{row}"][col - 1] if f"G{row}" in data else "?"
-        for idx, col, row in coords
-    }
+    decoded = {idx - 1: data[f"G{row}"][col - 1] if f"G{row}" in data else "?" for idx, col, row in coords}
     max_idx = max(co[0] for co in coords)
     result = ""
     for i in range(max_idx):
@@ -54,6 +50,12 @@ def decode(data: Dict[str, str], *coords: Tuple[int, int, int]) -> str:
 
 
 def solve_g1_g2_g3() -> Dict[str, str]:
+    """
+    Solve G1 to G3 of the body message.
+
+    :return: The solved codes G1 to G3.
+    """
+
     def decode_reference(reference: Sequence[str]) -> Iterable[Tuple[int, int, int]]:
         assert len(reference) % 5 == 0
         for i in range(0, len(reference), 5):

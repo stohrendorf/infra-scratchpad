@@ -1,3 +1,5 @@
+"""The message found in Open Sewer radio_behind_door_001.wav."""
+
 radio_behind_door_001_transcription = (
     "0 11 Grad 17,40 Minuten Ost."
     " Die Schifffahrt wird gebeten mit einem Abstand von 0,5 Seemeilen zu ..."

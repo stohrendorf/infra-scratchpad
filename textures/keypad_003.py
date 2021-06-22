@@ -1,3 +1,5 @@
+"""The solution for the code found in keypad_003.vtf."""
+
 from infra.binary import binary_decode_multi
 
 keypad_003 = (

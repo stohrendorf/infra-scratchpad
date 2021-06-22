@@ -1,3 +1,5 @@
+"""The solution for the code found in mailbox_skin2.vtf."""
+
 from infra.binary import binary_decode_multi
 from infra.string import insert_spaces
 

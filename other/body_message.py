@@ -1,3 +1,5 @@
+"""The solution of https://stalburg.net/Body_message."""
+
 from typing import Dict, Tuple
 
 from textures.scientific_table_001_skin3 import solve_g1_g2_g3
@@ -38,9 +40,9 @@ body_message = (
 )
 
 
-def decode_body_message(key: Dict[str, str], message: Tuple[str, ...]) -> str:
+def _decode_body_message(key: Dict[str, str], message: Tuple[str, ...]) -> str:
     return " ".join(key.get(code, f"[{code}]") for code in message)
 
 
 if __name__ == "__main__":
-    print(decode_body_message(body_code, body_message))
+    print(_decode_body_message(body_code, body_message))

@@ -1,5 +1,7 @@
-from infra.utils import rotate_right
+"""Solution of https://stalburg.net/Office_monitor_code."""
+
 from infra.binary import binary_decode_multi
+from infra.utils import rotate_right
 
 # codes start with the first complete code, the last one is usually wrapped
 computer_screen_skin8 = (
@@ -25,11 +27,8 @@ computer_screen_skin8 = (
 if __name__ == "__main__":
     result = "".join(
         rotate_right(
-            [
-                rotate_right(binary_decode_multi(binary), rotation)
-                for binary, rotation in computer_screen_skin8[::-1]
-            ],
+            [rotate_right(binary_decode_multi(binary), rotation) for binary, rotation in computer_screen_skin8[::-1]],
             5,
-        )
+        ),
     )
     print(result)

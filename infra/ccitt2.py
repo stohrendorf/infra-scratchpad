@@ -1,3 +1,5 @@
+"""CCITT2 encoding and decoding functions."""
+
 from typing import Iterable
 
 ccitt2_table = {
@@ -33,34 +35,31 @@ ccitt2_table = {
     0b00000: ("[unused]", "[unused]"),
 }
 
-ccitt2_table_encode_letters = {
-    letter: code for code, (letter, _) in ccitt2_table.items()
-}
-ccitt2_table_encode_symbols = {
-    symbol: code for code, (_, symbol) in ccitt2_table.items()
-}
-ccitt2_table_decode_letters = {
-    code: letter for code, (letter, _) in ccitt2_table.items()
-}
-ccitt2_table_decode_symbols = {
-    code: symbol for code, (_, symbol) in ccitt2_table.items()
-}
+ccitt2_table_encode_letters = {letter: code for code, (letter, _) in ccitt2_table.items()}
+ccitt2_table_encode_symbols = {symbol: code for code, (_, symbol) in ccitt2_table.items()}
+ccitt2_table_decode_letters = {code: letter for code, (letter, _) in ccitt2_table.items()}
+ccitt2_table_decode_symbols = {code: symbol for code, (_, symbol) in ccitt2_table.items()}
 
 ccitt2_select_letters = 0b11111
 ccitt2_select_symbols = 0b11011
 
 
 def ccitt2_encode(input: str) -> Iterable[int]:
+    """
+    Encode a string as CCITT2.
+
+    :param input: The string to encode.
+    :return: The encoded data.
+
+    >>> list(map(bin, ccitt2_encode("A:")))
+    ['0b11', '0b11011', '0b1110']
+    """
     mode_letters = True
     current_table = ccitt2_table_encode_letters
     for char in input:
         current = current_table.get(char)
         if current is None:
-            current_table = (
-                ccitt2_table_encode_symbols
-                if mode_letters
-                else ccitt2_table_encode_letters
-            )
+            current_table = ccitt2_table_encode_symbols if mode_letters else ccitt2_table_encode_letters
             mode_letters = not mode_letters
             current = current_table[char]
             yield ccitt2_select_letters if mode_letters else ccitt2_select_symbols
@@ -68,6 +67,15 @@ def ccitt2_encode(input: str) -> Iterable[int]:
 
 
 def ccitt2_decode(input: Iterable[int]) -> str:
+    """
+    Decode a CCITT2 encoded string.
+
+    :param input: The encoded string.
+    :return: The decoded string.
+
+    >>> ccitt2_decode((0b00011, 0b11011, 0b01110))
+    'A:'
+    """
     current_table = ccitt2_table_decode_letters
 
     decoded = ""

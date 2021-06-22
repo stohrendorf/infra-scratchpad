@@ -1,3 +1,5 @@
+"""The solution of sign_07_skin10.vtf."""
+
 from infra.binary import binary_decode_multi
 
 sign_07_skin10 = (

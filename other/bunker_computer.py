@@ -1,3 +1,5 @@
+"""The solution of https://stalburg.net/Bunker_computer_code."""
+
 from typing import Dict, Tuple
 
 from other.body_message import body_code
@@ -85,7 +87,7 @@ bunker_computer_code_3 = (
 )
 
 
-def decrypt_bunker_computer_code_2() -> str:
+def _decrypt_bunker_computer_code_2() -> str:
     def decrypt_letter(code: str) -> str:
         body_code_key, letter = code.split(".")
         try:
@@ -96,30 +98,24 @@ def decrypt_bunker_computer_code_2() -> str:
     return "".join(decrypt_letter(code) for code in bunker_computer_code_2)
 
 
-bunker_computer_code_2_solution_unpatched = decrypt_bunker_computer_code_2()
+bunker_computer_code_2_solution_unpatched = _decrypt_bunker_computer_code_2()
 
 
-def count_usages(data: Tuple[Tuple[str, ...], ...]) -> Dict[str, int]:
-    result = {
-        f"{x + 1}.{y + 1}": 0
-        for y, y_data in enumerate(data)
-        for x in range(len(y_data))
-    }
+def _count_usages(data: Tuple[Tuple[str, ...], ...]) -> Dict[str, int]:
+    result = {f"{x + 1}.{y + 1}": 0 for y, y_data in enumerate(data) for x in range(len(y_data))}
     for code in bunker_computer_code_3:
         result[code] += 1
 
     return result
 
 
-def print_non_unique_code_usage_part_3():
-    for code, usage_count in count_usages(bunker_computer_code_1).items():
+def _print_non_unique_code_usage_part_3():
+    for code, usage_count in _count_usages(bunker_computer_code_1).items():
         if usage_count != 1:
             column, row = code.split(".")
-            print(
-                code, bunker_computer_code_1[int(row) - 1][int(column) - 1], usage_count
-            )
+            print(code, bunker_computer_code_1[int(row) - 1][int(column) - 1], usage_count)
 
 
 if __name__ == "__main__":
-    print(decrypt_bunker_computer_code_2())
-    print_non_unique_code_usage_part_3()
+    print(_decrypt_bunker_computer_code_2())
+    _print_non_unique_code_usage_part_3()

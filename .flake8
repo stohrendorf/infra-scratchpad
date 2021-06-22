@@ -1,0 +1,12 @@
+[flake8]
+statistics = True
+inline-quotes = double
+multiline-quotes = double
+no-accept-encodings = True
+import-order-style = pycharm
+exclude =
+    venv,
+max-line-length = 120
+extend-ignore =
+    # See https://github.com/PyCQA/pycodestyle/issues/373
+    E203,

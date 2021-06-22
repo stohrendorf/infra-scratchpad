@@ -1,9 +1,12 @@
+"""Binary string utility functions."""
+
 from typing import Iterable
 
 
 def binary_decode(binary: str) -> str:
     """
-    Decodes an 8-bit binary number.
+    Decode an 8-bit binary number.
+
     :param binary: A binary string.
     :return: The character representation.
 
@@ -16,7 +19,8 @@ def binary_decode(binary: str) -> str:
 
 def binary_decode_multi(words: str) -> str:
     """
-    Decodes a string of binary codes.
+    Decode a string of binary codes.
+
     :param words: The binary codes.
     :return: The decoded string.
 
@@ -27,10 +31,28 @@ def binary_decode_multi(words: str) -> str:
 
 
 def invert_bits(binary: str) -> str:
+    """
+    Invert the bits of some binary code.
+
+    :param binary: The binary string.
+    :return: The inverted binary string.
+
+    >>> invert_bits("0110")
+    '1001'
+    """
     assert all(c in ("0", "1") for c in binary)
     return "".join(str(1 - int(c)) for c in binary)
 
 
 def binary_encode(string: str) -> Iterable[str]:
+    """
+    Encode some string as binary.
+
+    :param string: The string to encode.
+    :return: The characters encoded as binary.
+
+    >>> list(binary_encode("test"))
+    ['01110100', '01100101', '01110011', '01110100']
+    """
     for c in map(ord, string):
         yield "".join(str((c >> (7 - i)) & 1) for i in range(8))

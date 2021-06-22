@@ -1,9 +1,12 @@
+"""String-related utility functions."""
+
 from typing import Iterable
 
 
 def all_string_indices(haystack: str, needle: str) -> Iterable[int]:
     """
-    Finds all indices of a given needle in a haystack.
+    Find all indices of a given needle in a haystack.
+
     :return: An iterable of the found indices.
 
     >>> list(all_string_indices("ABA", "A"))
@@ -20,7 +23,8 @@ def all_string_indices(haystack: str, needle: str) -> Iterable[int]:
 
 def char_idx(char: str) -> int:
     """
-    The index of an uppercase character.
+    Get the index of an uppercase character.
+
     :param char: The input character.
     :return: The index.
 
@@ -34,13 +38,11 @@ def char_idx(char: str) -> int:
 def insert_spaces(string: str, every: int) -> str:
     """
     Insert spaces at regular intervals.
+
     :param string: The string to insert the spaces into.
     :param every: The interval to insert spaces at.
 
     >>> insert_spaces("ABCDEFGH", 3)
     'ABC DEF GH'
     """
-    return " ".join(
-        string[every * i : every * (i + 1)]
-        for i in range((len(string) + every - 1) // every)
-    )
+    return " ".join(string[every * i : every * (i + 1)] for i in range((len(string) + every - 1) // every))
