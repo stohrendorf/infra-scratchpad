@@ -1,6 +1,6 @@
 """Transposition cipher function."""
 
-from typing import List, Tuple, TypeVar, Union
+from typing import List, Sequence, Tuple, TypeVar, Union
 
 from infra.string import all_string_indices, split_every
 
@@ -95,4 +95,20 @@ def columnar_decode(encoded: str, key: str) -> str:
     return "".join(column[i] for i in range(rows) for column in columns if i < len(column))
 
 
-assert "".join(columnar_decode_shuffle(columnar_encode_shuffle("ABCDEF", "HELLOW"), "HELLOW")) == "ABCDEF"
+def transpose(strings: Sequence[str]) -> Tuple[str, ...]:
+    """
+    Transpose a list of strings.
+
+    :param strings: The strings to transpose.
+    :return: The transposed strings.
+
+    >>> transpose(("HELLO", "WORLD"))
+    ('HW', 'EO', 'LR', 'LL', 'OD')
+    """
+    if not strings:
+        return ()
+
+    first_length = len(strings[0])
+    assert all(first_length == len(s) for s in strings)
+
+    return tuple("".join(column[x] for column in strings) for x in range(first_length))
