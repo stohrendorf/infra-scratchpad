@@ -1,6 +1,6 @@
 """Functions related to scanning and modifying dicts."""
 
-from typing import Dict, Iterable, List, Tuple, TypeVar
+from typing import Dict, List, Tuple, TypeVar
 
 from infra.string import all_string_indices
 from infra.utils import Rotatable, rotate_left
@@ -9,7 +9,7 @@ TKey = TypeVar("TKey")
 TValue = TypeVar("TValue")
 
 
-def find_char(data: Dict[TKey, str], char: str) -> Iterable[Tuple[TKey, int]]:
+def find_char(data: Dict[TKey, str], char: str) -> Tuple[Tuple[TKey, int]]:
     """
     Find all indices of a given char in a dictionary of strings.
 
@@ -22,9 +22,7 @@ def find_char(data: Dict[TKey, str], char: str) -> Iterable[Tuple[TKey, int]]:
     [('A', 2)]
     """
     assert len(char) == 1
-    for key, values in data.items():
-        for index in all_string_indices(values, char):
-            yield key, index + 1
+    return tuple((key, index + 1) for key, values in data.items() for index in all_string_indices(values, char))
 
 
 def find_string_chars(data: Dict[TKey, str], string: str) -> List[Tuple[str, List[Tuple[TKey, int]]]]:

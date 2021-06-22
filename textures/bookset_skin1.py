@@ -1,6 +1,6 @@
 """All codes found so far following the scheme letter-dot-number."""
 
-bookset_skin_1 = {
+bookset_skin1 = {
     1: "E",  # bookset_skin1
     2: "C",  # bookset_skin1; large_transformer
     3: "N",  # electricalbox_006_skin1

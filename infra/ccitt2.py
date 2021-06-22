@@ -44,11 +44,11 @@ ccitt2_select_letters = 0b11111
 ccitt2_select_symbols = 0b11011
 
 
-def ccitt2_encode(input: str) -> Iterable[int]:
+def ccitt2_encode(string: str) -> Iterable[int]:
     """
     Encode a string as CCITT2.
 
-    :param input: The string to encode.
+    :param string: The string to encode.
     :return: The encoded data.
 
     >>> list(map(bin, ccitt2_encode("A:")))
@@ -56,7 +56,7 @@ def ccitt2_encode(input: str) -> Iterable[int]:
     """
     mode_letters = True
     current_table = ccitt2_table_encode_letters
-    for char in input:
+    for char in string:
         current = current_table.get(char)
         if current is None:
             current_table = ccitt2_table_encode_symbols if mode_letters else ccitt2_table_encode_letters
@@ -66,11 +66,11 @@ def ccitt2_encode(input: str) -> Iterable[int]:
         yield current
 
 
-def ccitt2_decode(input: Iterable[int]) -> str:
+def ccitt2_decode(encoded: Iterable[int]) -> str:
     """
     Decode a CCITT2 encoded string.
 
-    :param input: The encoded string.
+    :param encoded: The encoded string.
     :return: The decoded string.
 
     >>> ccitt2_decode((0b00011, 0b11011, 0b01110))
@@ -79,7 +79,7 @@ def ccitt2_decode(input: Iterable[int]) -> str:
     current_table = ccitt2_table_decode_letters
 
     decoded = ""
-    for value in input:
+    for value in encoded:
         if value == ccitt2_select_letters:
             current_table = ccitt2_table_decode_letters
             continue

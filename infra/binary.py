@@ -1,6 +1,6 @@
 """Binary string utility functions."""
 
-from typing import Iterable
+from typing import Tuple
 
 
 def binary_decode(binary: str) -> str:
@@ -44,17 +44,21 @@ def invert_bits(binary: str) -> str:
     return "".join(str(1 - int(c)) for c in binary)
 
 
-def binary_encode(string: str) -> Iterable[str]:
+def binary_encode(string: str) -> Tuple[str]:
     """
     Encode some string as binary.
 
     :param string: The string to encode.
     :return: The characters encoded as binary.
 
-    >>> list(binary_encode("test"))
-    ['01110100', '01100101', '01110011', '01110100']
+    >>> binary_encode("test")
+    ('01110100', '01100101', '01110011', '01110100')
     """
-    for c in map(ord, string):
-        if not (0 < c < 0x80):
+
+    def to_validated_binary(code: int) -> str:
+        if not (0 < code < 0x80):
             raise ValueError("string contains non-ASCII characters")
-        yield bin(c)[2:].rjust(8, "0")
+
+        return bin(code)[2:].rjust(8, "0")
+
+    return tuple(map(to_validated_binary, map(ord, string)))
