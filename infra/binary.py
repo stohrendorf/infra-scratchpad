@@ -55,4 +55,6 @@ def binary_encode(string: str) -> Iterable[str]:
     ['01110100', '01100101', '01110011', '01110100']
     """
     for c in map(ord, string):
-        yield "".join(str((c >> (7 - i)) & 1) for i in range(8))
+        if not (0 < c < 0x80):
+            raise ValueError("string contains non-ASCII characters")
+        yield bin(c)[2:].rjust(8, "0")
