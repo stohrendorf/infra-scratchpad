@@ -10,6 +10,17 @@ def _load_frq_csv(path: Path) -> Dict[str, float]:
     return {key: float(count) for key, count in csv.reader(path.read_text().splitlines())}
 
 
+def _load_cblw_score_csv(path: Path) -> Dict[str, float]:
+    def idx_to_letter(idx: int) -> str:
+        return chr(ord("A") + idx)
+
+    return {
+        f"{idx_to_letter(x)}{idx_to_letter(y)}": float(score)
+        for x, scores in enumerate(csv.reader(path.read_text().splitlines()))
+        for y, score in enumerate(scores)
+    }
+
+
 def get_quantile(data: Dict[str, float], quantile: float) -> Set[str]:
     """
     Get the top quantile of a data set.
@@ -35,6 +46,7 @@ def get_quantile(data: Dict[str, float], quantile: float) -> Set[str]:
 letter_frq_en = _load_frq_csv(Path(__file__).parent / "letter_frq_en.csv")
 total_letter_frq_en = sum(letter_frq_en.values())
 top_letters_en = get_quantile(letter_frq_en, 0.75)
+cblw_scores_en = _load_cblw_score_csv(Path(__file__).parent / "cblw_scores_en.csv")
 
 bigram_frq_en = _load_frq_csv(Path(__file__).parent / "bigram_frq_en.csv")
 total_bigram_frq_en = sum(bigram_frq_en.values())
@@ -74,18 +86,20 @@ def get_mfl_bigram_score_en(string: str) -> float:
 
 def get_cblw_score(s1: str, s2: str) -> float:
     """
-    Get the cumulative bigram score of two strings.
+    Get the conditional bigram log-weight score of two strings.
+
+    https://www.staff.uni-mainz.de/pommeren/Cryptology/Classic/8_Transpos/Approach.html
 
     :param s1: First string.
     :param s2: Second string.
     :return: The score.
 
     >>> get_cblw_score("HELLO", "WORLD")
-    0.002076565386330339
+    1.3599999999999999
     >>> get_cblw_score("HLLOWRD", "ELLOOL")
-    0.01266535023462216
+    1.9333333333333336
     """
     score = 0.0
     for c1, c2 in zip(s1, s2):
-        score += bigram_frq_en.get(f"{c1}{c2}".upper(), 0.0) / total_bigram_frq_en
+        score += cblw_scores_en.get(f"{c1}{c2}".upper(), 0.0)
     return score / min(len(s1), len(s2))
