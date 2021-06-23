@@ -1,7 +1,7 @@
 """Natural language analysis functions."""
 import csv
 from pathlib import Path
-from typing import Dict, Iterable, Set, Tuple
+from typing import Dict, FrozenSet, Iterable, Set, Tuple
 
 from infra.utils import get_pairs, split_every
 
@@ -23,8 +23,8 @@ def _load_cblw_score_csv(path: Path) -> Dict[str, float]:
     }
 
 
-def _load_dict(filename: str) -> Set[str]:
-    return {word.upper() for word in (Path(__file__).parent / "data" / filename).read_text().splitlines()}
+def _load_dict(filename: str) -> FrozenSet[str]:
+    return frozenset(word.upper() for word in (Path(__file__).parent / "data" / filename).read_text().splitlines())
 
 
 def _load_float_list(filename: str) -> Iterable[float]:
