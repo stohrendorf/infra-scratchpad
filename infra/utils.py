@@ -66,3 +66,18 @@ def split_every(data: Indexable, every: int) -> Tuple[Indexable]:
     ('AB', 'CD', 'E')
     """
     return tuple(data[every * i : every * (i + 1)] for i in range((len(data) + every - 1) // every))
+
+
+def get_pairs(n: int) -> Iterable[Tuple[int, int]]:
+    """
+    Get pairs of indices that are not equal.
+
+    :param n: The range of indices.
+    :return: The pairs of non-equal indices.
+
+    >>> tuple(get_pairs(2))
+    ((0, 1), (1, 0))
+    >>> tuple(get_pairs(3))
+    ((0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1))
+    """
+    return ((a, b) for a in range(n) for b in range(n) if a != b)
