@@ -1,6 +1,6 @@
 """Functions related to scanning and modifying dicts."""
 
-from typing import Dict, List, Tuple, TypeVar
+from typing import Dict, List, Tuple, TypeVar, Union
 
 from infra.string import all_string_indices
 from infra.utils import Rotatable, rotate_left
@@ -94,7 +94,7 @@ def rotate_value_left(data: Dict[TKey, Rotatable], key: TKey, n: int):
     data[key] = rotate_left(data[key], n)
 
 
-def swap_columns(data: Dict[TKey, Rotatable], a: int, b: int):
+def swap_columns(data: Union[Dict[TKey, Rotatable], List[Rotatable]], a: int, b: int):
     """
     Swap two columns of a dictionary.
 
@@ -107,7 +107,7 @@ def swap_columns(data: Dict[TKey, Rotatable], a: int, b: int):
     >>> data
     {'A': 'CB', 'D': 'FE'}
     """
-    for key, values in data.items():
+    for key, values in data.items() if isinstance(data, dict) else enumerate(data):
         ac = values[a]
         bc = values[b]
         s = values
