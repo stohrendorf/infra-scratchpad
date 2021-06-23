@@ -81,3 +81,16 @@ def get_pairs(n: int) -> Iterable[Tuple[int, int]]:
     ((0, 1), (0, 2), (1, 0), (1, 2), (2, 0), (2, 1))
     """
     return ((a, b) for a in range(n) for b in range(n) if a != b)
+
+
+def inverse_cumulative_sum(values: Sequence[int]) -> Tuple[int, ...]:
+    """
+    Calculate the differences between adjacent numbers in a sequence.
+
+    :param values: The values.
+    :return: The differences
+
+    >>> inverse_cumulative_sum((1, 3, 8))
+    (2, 5)
+    """
+    return tuple(b - a for a, b in zip(values, values[1:]))
