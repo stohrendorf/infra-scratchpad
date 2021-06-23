@@ -1,8 +1,12 @@
 """Transposition cipher function."""
+import math
+from dataclasses import dataclass
+from enum import Enum, auto
+from typing import Callable, Dict, List, Sequence, Tuple, TypeVar, Union
 
-from typing import List, Sequence, Tuple, TypeVar, Union
-
+from infra.nla import bigram_frq_en, dict_std_en, letter_frq_en, trigram_frq_en
 from infra.string import all_string_indices, split_every
+from infra.utils import reverse_sequence
 
 
 def get_encoding_mapping(key: str) -> Tuple[int]:
@@ -112,3 +116,491 @@ def transpose(strings: Sequence[str]) -> Tuple[str, ...]:
     assert all(first_length == len(s) for s in strings)
 
     return tuple("".join(column[x] for column in strings) for x in range(first_length))
+
+
+class GridPath(Enum):
+    """The possible paths when walking a grid."""
+
+    HORIZONTALS_STRAIGHT_TL = auto()
+    HORIZONTALS_STRAIGHT_BL = auto()
+    HORIZONTALS_REVERSE_TR = auto()
+    HORIZONTALS_REVERSE_BR = auto()
+    HORIZONTALS_ALTERNATE_TL = auto()
+    HORIZONTALS_ALTERNATE_TR = auto()
+    HORIZONTALS_ALTERNATE_BR = auto()
+    HORIZONTALS_ALTERNATE_BL = auto()
+
+    VERTICALS_DESCENDING_TL = auto()
+    VERTICALS_DESCENDING_TR = auto()
+    VERTICALS_ASCENDING_BL = auto()
+    VERTICALS_ASCENDING_BR = auto()
+    VERTICALS_ALTERNATE_TL = auto()
+    VERTICALS_ALTERNATE_TR = auto()
+    VERTICALS_ALTERNATE_BR = auto()
+    VERTICALS_ALTERNATE_BL = auto()
+
+    SPIRAL_CLOCKWISE_IN_TL = auto()
+    SPIRAL_CLOCKWISE_IN_TR = auto()
+    SPIRAL_CLOCKWISE_IN_BR = auto()
+    SPIRAL_CLOCKWISE_IN_BL = auto()
+
+    SPIRAL_ANTICLOCKWISE_IN_TL = auto()
+    SPIRAL_ANTICLOCKWISE_IN_TR = auto()
+    SPIRAL_ANTICLOCKWISE_IN_BR = auto()
+    SPIRAL_ANTICLOCKWISE_IN_BL = auto()
+
+    SPIRAL_CLOCKWISE_OUT_TL = auto()
+    SPIRAL_CLOCKWISE_OUT_TR = auto()
+    SPIRAL_CLOCKWISE_OUT_BR = auto()
+    SPIRAL_CLOCKWISE_OUT_BL = auto()
+
+    SPIRAL_ANTICLOCKWISE_OUT_TL = auto()
+    SPIRAL_ANTICLOCKWISE_OUT_TR = auto()
+    SPIRAL_ANTICLOCKWISE_OUT_BR = auto()
+    SPIRAL_ANTICLOCKWISE_OUT_BL = auto()
+
+
+def create_grid(rows: int, cols: int, default: T) -> List[List[T]]:
+    """
+    Create a new rectangular grid of given dimensions.
+
+    :param rows: Number of rows.
+    :param cols: Number of columns.
+    :param default: Default value to fill the grid with.
+    :return: The grid of dimensions [rows][cols].
+
+    >>> create_grid(3, 2, 0)
+    [[0, 0], [0, 0], [0, 0]]
+    """
+    return [[default] * cols for _ in range(rows)]
+
+
+def walk_path(
+    path: GridPath,
+    rows: int,
+    cols: int,
+    action: Callable[[int, int], None],
+    action_reverse: Callable[[int, int], None],
+):
+    """
+    Execute actions while walking over a grid.
+
+    :param path: The path to follow.
+    :param rows: Rows in the grid.
+    :param cols: Columns in the grid.
+    :param action: What to do when visiting a cell; "inwards" if on a spiral path.
+    :param action_reverse: What to do when visiting a cell; "outwards" if on a spiral path,
+           and only relevant for spiral paths.
+    """
+    dir_up = 0
+    dir_right = 1
+    dir_down = 2
+    dir_left = 3
+
+    def rotate_cw(d: int) -> int:
+        return (d + 1) % 4
+
+    def rotate_ccw(d: int) -> int:
+        return (d + 3) % 4
+
+    def dir_to_dy(d: int) -> int:
+        if d == dir_up:
+            return -1
+        elif d == dir_down:
+            return 1
+        else:
+            return 0
+
+    def dir_to_dx(d: int) -> int:
+        if d == dir_left:
+            return -1
+        elif d == dir_right:
+            return 1
+        else:
+            return 0
+
+    marker_grid = create_grid(rows, cols, False)
+
+    def walk_spiral(
+        y: int,
+        x: int,
+        direction: int,
+        rotate: Callable[[int], int],
+        action: Callable[[int, int], None],
+    ):
+        for _ in range(1, rows * cols):
+            assert not marker_grid[y][x]
+            action(y, x)
+            marker_grid[y][x] = True
+
+            nx = x + dir_to_dx(direction)
+            ny = y + dir_to_dy(direction)
+            if not (0 <= ny < rows) or not (0 <= nx < cols) or marker_grid[ny][nx]:
+                direction = rotate(direction)
+            y += dir_to_dy(direction)
+            x += dir_to_dx(direction)
+        action(y, x)
+
+    if path == GridPath.HORIZONTALS_STRAIGHT_TL:
+        for r in range(rows):
+            for c in range(cols):
+                action(r, c)
+    elif path == GridPath.HORIZONTALS_STRAIGHT_BL:
+        for r in reverse_sequence(rows):
+            for c in range(cols):
+                action(r, c)
+    elif path == GridPath.HORIZONTALS_REVERSE_TR:
+        for r in range(rows):
+            for c in reverse_sequence(cols):
+                action(r, c)
+    elif path == GridPath.HORIZONTALS_REVERSE_BR:
+        for r in reverse_sequence(rows):
+            for c in reverse_sequence(cols):
+                action(r, c)
+    elif path == GridPath.HORIZONTALS_ALTERNATE_TL:
+        for r in range(rows):
+            if ((r + 1) % 2) != 0:
+                for c in range(cols):
+                    action(r, c)
+            else:
+                for c in reverse_sequence(cols):
+                    action(r, c)
+    elif path == GridPath.HORIZONTALS_ALTERNATE_TR:
+        for r in range(rows):
+            if (r % 2) != 0:
+                for c in range(cols):
+                    action(r, c)
+            else:
+                for c in reverse_sequence(cols):
+                    action(r, c)
+    elif path == GridPath.HORIZONTALS_ALTERNATE_BL:
+        for r in reverse_sequence(rows):
+            if ((rows - r) % 2) != 0:
+                for c in range(cols):
+                    action(r, c)
+            else:
+                for c in reverse_sequence(cols):
+                    action(r, c)
+    elif path == GridPath.HORIZONTALS_ALTERNATE_BR:
+        for r in reverse_sequence(rows):
+            if ((rows - r + 1) % 2) != 0:
+                for c in range(cols):
+                    action(r, c)
+            else:
+                for c in reverse_sequence(cols):
+                    action(r, c)
+    elif path == GridPath.VERTICALS_DESCENDING_TL:
+        for c in range(cols):
+            for r in range(rows):
+                action(r, c)
+    elif path == GridPath.VERTICALS_DESCENDING_TR:
+        for c in reverse_sequence(cols):
+            for r in range(rows):
+                action(r, c)
+    elif path == GridPath.VERTICALS_ASCENDING_BL:
+        for c in range(cols):
+            for r in reverse_sequence(rows):
+                action(r, c)
+    elif path == GridPath.VERTICALS_ASCENDING_BR:
+        for c in reverse_sequence(cols):
+            for r in reverse_sequence(rows):
+                action(r, c)
+    elif path == GridPath.VERTICALS_ALTERNATE_TL:
+        for c in range(cols):
+            if ((c + 1) % 2) != 0:
+                for r in range(rows):
+                    action(r, c)
+            else:
+                for r in reverse_sequence(rows):
+                    action(r, c)
+    elif path == GridPath.VERTICALS_ALTERNATE_BL:
+        for c in range(cols):
+            if (c % 2) != 0:
+                for r in range(rows):
+                    action(r, c)
+            else:
+                for r in reverse_sequence(rows):
+                    action(r, c)
+    elif path == GridPath.VERTICALS_ALTERNATE_TR:
+        for c in reverse_sequence(cols):
+            if ((cols - c) % 2) != 0:
+                for r in range(rows):
+                    action(r, c)
+            else:
+                for r in reverse_sequence(rows):
+                    action(r, c)
+    elif path == GridPath.VERTICALS_ALTERNATE_BR:
+        for c in reverse_sequence(cols):
+            if ((cols - c + 1) % 2) != 0:
+                for r in range(rows):
+                    action(r, c)
+            else:
+                for r in reverse_sequence(rows):
+                    action(r, c)
+    elif path == GridPath.SPIRAL_CLOCKWISE_IN_TL:
+        walk_spiral(0, 0, dir_right, rotate_cw, action)
+    elif path == GridPath.SPIRAL_CLOCKWISE_IN_TR:
+        walk_spiral(0, cols - 1, dir_down, rotate_cw, action)
+    elif path == GridPath.SPIRAL_CLOCKWISE_IN_BR:
+        walk_spiral(rows - 1, cols - 1, dir_left, rotate_cw, action)
+    elif path == GridPath.SPIRAL_CLOCKWISE_IN_BL:
+        walk_spiral(rows - 1, 0, dir_up, rotate_cw, action)
+    elif path == GridPath.SPIRAL_ANTICLOCKWISE_IN_TL:
+        walk_spiral(0, 0, dir_down, rotate_ccw, action)
+    elif path == GridPath.SPIRAL_ANTICLOCKWISE_IN_TR:
+        walk_spiral(0, cols - 1, dir_left, rotate_ccw, action)
+    elif path == GridPath.SPIRAL_ANTICLOCKWISE_IN_BR:
+        walk_spiral(rows - 1, cols - 1, dir_up, rotate_ccw, action)
+    elif path == GridPath.SPIRAL_ANTICLOCKWISE_IN_BL:
+        walk_spiral(rows - 1, 0, dir_right, rotate_ccw, action)
+    elif path == GridPath.SPIRAL_ANTICLOCKWISE_OUT_TL:
+        walk_spiral(0, 0, dir_right, rotate_cw, action_reverse)
+    elif path == GridPath.SPIRAL_ANTICLOCKWISE_OUT_TR:
+        walk_spiral(0, cols - 1, dir_down, rotate_cw, action_reverse)
+    elif path == GridPath.SPIRAL_ANTICLOCKWISE_OUT_BR:
+        walk_spiral(rows - 1, cols - 1, dir_left, rotate_cw, action_reverse)
+    elif path == GridPath.SPIRAL_ANTICLOCKWISE_OUT_BL:
+        walk_spiral(rows - 1, 0, dir_up, rotate_cw, action_reverse)
+    elif path == GridPath.SPIRAL_CLOCKWISE_OUT_TL:
+        walk_spiral(0, 0, dir_down, rotate_ccw, action_reverse)
+    elif path == GridPath.SPIRAL_CLOCKWISE_OUT_TR:
+        walk_spiral(0, cols - 1, dir_left, rotate_ccw, action_reverse)
+    elif path == GridPath.SPIRAL_CLOCKWISE_OUT_BR:
+        walk_spiral(rows - 1, cols - 1, dir_up, rotate_ccw, action_reverse)
+    elif path == GridPath.SPIRAL_CLOCKWISE_OUT_BL:
+        walk_spiral(rows - 1, 0, dir_right, rotate_ccw, action_reverse)
+    else:
+        raise ValueError
+
+
+def text_to_grid(rows: int, cols: int, text: str, path: GridPath) -> List[List[str]]:
+    """
+    Write text into a grid.
+
+    :param rows: The grid rows.
+    :param cols: The grid columns.
+    :param text: The text to write into the grid.
+    :param path: The path to follow when writing the characters.
+    :return: The grid.
+    """
+    grid = create_grid(rows, cols, " ")
+    text_iter = iter(text)
+    rev_text_iter = iter(text[::-1])
+
+    def action(y, x):
+        grid[y][x] = next(text_iter)
+
+    def rev_action(r, c):
+        grid[r][c] = next(rev_text_iter)
+
+    walk_path(path, rows, cols, action, rev_action)
+
+    return grid
+
+
+def grid_to_text(grid: List[List[str]], path: GridPath) -> str:
+    """
+    Convert a grid to text.
+
+    :param grid: The grid to convert.
+    :param path: The path to use when reading the characters from the grid.
+    :return: The text.
+    """
+    text = [" "] * len(grid) * len(grid[0])
+    pos = 0
+    end_pos = len(text) - 1
+
+    def action(r, c):
+        nonlocal pos
+        text[pos] = grid[r][c]
+        pos += 1
+
+    def rev_action(r, c):
+        nonlocal end_pos
+        text[end_pos] = grid[r][c]
+        end_pos -= 1
+
+    walk_path(path, len(grid), len(grid[0]), action, rev_action)
+
+    return "".join(text)
+
+
+def transform_text_with_grid(
+    rows: int,
+    cols: int,
+    text: str,
+    output_path: GridPath,
+    input_path: GridPath,
+    null_char: str = "_",
+) -> str:
+    """
+    Transform a text by passing it through a grid, using different paths for writing and reading.
+
+    :param rows: Grid rows.
+    :param cols: Grid columns.
+    :param text: Text to transform.
+    :param output_path: How to write the initial text into the grid.
+    :param input_path: How to read the text back from the grid.
+    :param null_char: A characters inserted if there's too less text to fill the grid.
+    :return: The transformed text.
+    """
+    grid_size = cols * rows
+    result = ""
+    for pos in range(0, len(text), grid_size):
+        partial = text[pos : pos + grid_size].ljust(grid_size, null_char)
+        grid = text_to_grid(rows, cols, partial, output_path)
+        result += grid_to_text(grid, input_path)
+    return result
+
+
+def word_fitness_en(text: str, min_word_length: int = 3, max_word_length: int = 12) -> float:
+    """
+    Calculate a text fitness by searching for known dictionary words.
+
+    :param text: The text to scan.
+    :param min_word_length: The minimum word length to consider.
+    :param max_word_length: The maximum word length to consider.
+    :return: Text length divided by amount of matching words.
+    """
+    matching_chars = 0
+    text_length = len(text)
+    text = text.upper()
+    for pos in range(text_length - min_word_length + 1):
+        for word_size in range(min_word_length, max_word_length + 1):
+            if pos + word_size >= text_length:
+                break
+            if text[pos : pos + word_size] in dict_std_en:
+                matching_chars += word_size
+                # Advance to next word
+                pos += word_size - 1
+    return max(1, matching_chars) / text_length
+
+
+@dataclass
+class Stats:
+    """Text statistics."""
+
+    letter_count: int
+    single_letters: Dict[str, float]
+    single_letter_error: float
+    bigrams: Dict[str, float]
+    bigram_error: float
+    trigrams: Dict[str, float]
+    trigram_error: float
+    total_error: float
+    ic: float
+    entropy: float
+
+    @property
+    def efficiency(self) -> float:  # noqa D102
+        return self.entropy / math.log(26.0)
+
+    @property
+    def redundancy(self) -> float:  # noqa D102
+        return 1.0 - self.efficiency
+
+
+def _make_frq_table(text: str) -> Tuple[Dict[str, float], Dict[str, float], Dict[str, float]]:
+
+    single_letters = dict()
+    for letter in text:
+        single_letters[letter] = single_letters.get(letter, 0.0) + 1.0
+    single_letters = {k: v / sum(single_letters.values()) for k, v in single_letters.items()}
+
+    bigrams = dict()
+    for bigram in map("".join, zip(text, text[1:])):
+        bigrams[bigram] = bigrams.get(bigram, 0.0) + 1.0
+    bigrams = {k: v / sum(bigrams.values()) for k, v in bigrams.items()}
+
+    trigrams = dict()
+    for trigram in map("".join, zip(text, text[1:], text[2:])):
+        trigrams[trigram] = trigrams.get(trigram, 0.0) + 1.0
+    trigrams = {k: v / sum(trigrams.values()) for k, v in trigrams.items()}
+
+    return single_letters, bigrams, trigrams
+
+
+def _total_error(single_letter_error: float, bigram_error: float, trigram_error: float) -> float:
+    return sum(a * b for a, b in zip((single_letter_error, bigram_error, trigram_error), (1.0, 1.0, 2.0)))
+
+
+def _calc_error(sample: Dict[str, float], base: Dict[str, float]) -> float:
+    return sum((base.get(k, 0.0) - v) ** 2 for k, v in sample.items())
+
+
+# Calculate index of coincidence
+def _calc_coincidence_index(single_letter_frq: Dict[str, float], letter_count: int) -> float:
+    return sum(freq * (letter_count * freq - 1) / (letter_count - 1) for freq in single_letter_frq.values())
+
+
+def _calc_entropy(single_letter_frq: Dict[str, float]) -> float:
+    return -sum(freq * math.log(freq) for freq in single_letter_frq.values() if freq > 0)
+
+
+def calc_stats(text: str) -> Stats:
+    """
+    Calculate several stats about a given text.
+
+    :param text: The text to calculate the stats on.
+    :return: The stats.
+    """
+    single_letters, bigrams, trigrams = _make_frq_table(text)
+    single_letter_error = _calc_error(single_letters, letter_frq_en)
+    bigram_error = _calc_error(bigrams, bigram_frq_en)
+    trigram_error = _calc_error(trigrams, trigram_frq_en)
+    return Stats(
+        letter_count=len(text),
+        single_letters=single_letters,
+        single_letter_error=single_letter_error,
+        bigrams=bigrams,
+        bigram_error=bigram_error,
+        trigrams=trigrams,
+        trigram_error=trigram_error,
+        total_error=_total_error(single_letter_error, bigram_error, trigram_error),
+        ic=_calc_coincidence_index(single_letters, len(text)),
+        entropy=_calc_entropy(single_letters),
+    )
+
+
+def find_best_path(
+    text: str,
+    rows: int,
+    cols: int,
+    fitness_fn: Callable[[str], float] = word_fitness_en,
+) -> Tuple[float, str, GridPath, GridPath]:
+    """
+    Find the best path types for transforming a text through a grid.
+
+    :param text: The text to transform.
+    :param rows: The rows in the grid.
+    :param cols: The columns in the grid.
+    :param fitness_fn: A fitness scoring function.
+    :return: A tuple of the fitness score, the transformed text, the input path type and the output path type.
+    """
+    text_stats: Stats
+    best_fitness: float
+    current_fitness: float
+
+    # Calculate the stats
+    text_stats = calc_stats(text)
+
+    # Check for zero length text
+    assert text_stats.letter_count != 0
+
+    best_fitness = 0.0
+    best_text = None
+    best_input_path = None
+    best_output_path = None
+
+    for output_path in GridPath:
+        for input_path in GridPath:
+            transformed = transform_text_with_grid(rows, cols, text, output_path, input_path)
+            current_fitness = fitness_fn(transformed)
+            if current_fitness > best_fitness:
+                best_fitness = current_fitness
+                best_text = transformed
+                best_input_path = input_path
+                best_output_path = output_path
+
+    assert best_text is not None
+    return best_fitness, best_text, best_input_path, best_output_path

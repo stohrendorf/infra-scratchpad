@@ -94,3 +94,16 @@ def inverse_cumulative_sum(values: Sequence[int]) -> Tuple[int, ...]:
     (2, 5)
     """
     return tuple(b - a for a, b in zip(values, values[1:]))
+
+
+def reverse_sequence(count: int) -> Iterable[int]:
+    """
+    Get a reverse sequence.
+
+    :param count: How many items to get.
+    :return: The reverse sequence.
+
+    >>> tuple(reverse_sequence(5))
+    (4, 3, 2, 1, 0)
+    """
+    yield from range(count - 1, -1, -1)

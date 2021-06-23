@@ -23,6 +23,26 @@ def _load_cblw_score_csv(path: Path) -> Dict[str, float]:
     }
 
 
+def _load_dict(filename: str) -> Set[str]:
+    return {word.upper() for word in (Path(__file__).parent / "data" / filename).read_text().splitlines()}
+
+
+def _load_float_list(filename: str) -> Iterable[float]:
+    yield from map(float, (Path(__file__).parent / "data" / filename).read_text().splitlines())
+
+
+dict_std_en = _load_dict("word_list_en.csv")
+letter_frq_en = {chr(ord("A") + i): value for i, value in enumerate(_load_float_list("letter_frq_en.csv"))}
+bigram_frq_en = {
+    chr(ord("A") + (i // 26)) + chr(ord("A") + (i % 26)): value
+    for i, value in enumerate(_load_float_list("bigram_frq_en.csv"))
+}
+trigram_frq_en = {
+    chr(ord("A") + (i // 26 // 26)) + chr(ord("A") + (i // 26 % 26)) + chr(ord("A") + (i % 26)): value
+    for i, value in enumerate(_load_float_list("trigram_frq_en.csv"))
+}
+
+
 def get_quantile(data: Dict[str, float], quantile: float) -> Set[str]:
     """
     Get the top quantile of a data set.
@@ -45,14 +65,10 @@ def get_quantile(data: Dict[str, float], quantile: float) -> Set[str]:
     return result
 
 
-letter_frq_en = _load_frq_csv(Path(__file__).parent / "letter_frq_en.csv")
-total_letter_frq_en = sum(letter_frq_en.values())
+cblw_scores_en = _load_cblw_score_csv(Path(__file__).parent / "data" / "cblw_scores_en.csv")
 top_letters_en = get_quantile(letter_frq_en, 0.75)
-cblw_scores_en = _load_cblw_score_csv(Path(__file__).parent / "cblw_scores_en.csv")
-
-bigram_frq_en = _load_frq_csv(Path(__file__).parent / "bigram_frq_en.csv")
-total_bigram_frq_en = sum(bigram_frq_en.values())
 top_bigrams_en = get_quantile(bigram_frq_en, 0.75)
+top_trigrams_en = get_quantile(trigram_frq_en, 0.75)
 
 
 def get_mfl_score_en(string: str) -> float:
@@ -62,7 +78,7 @@ def get_mfl_score_en(string: str) -> float:
     :return: The MFL score.
 
     >>> get_mfl_score_en("hello world")
-    0.8181818181818182
+    0.7272727272727273
     >>> get_mfl_score_en("uibyl jhboli")
     0.5
     """
@@ -76,9 +92,9 @@ def get_mfl_bigram_score_en(string: str) -> float:
     :return: The MFL score.
 
     >>> get_mfl_bigram_score_en("hello world")
-    0.2
+    0.5
     >>> get_mfl_bigram_score_en("uibyl jhboli")
-    0.0
+    0.09090909090909091
     """
     if len(string) <= 1:
         return 0.0
