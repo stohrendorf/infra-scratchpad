@@ -3,6 +3,8 @@ import csv
 from pathlib import Path
 from typing import Dict, Set
 
+alphabet_fi = "ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ"
+
 
 def _load_frq_csv(path: Path) -> Dict[str, float]:
     return {key: float(count) for key, count in csv.reader(path.read_text().splitlines())}
