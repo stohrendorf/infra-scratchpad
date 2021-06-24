@@ -1,6 +1,6 @@
 """Transposition cipher function."""
-from enum import Enum, auto
-from typing import Callable, List, Sequence, Tuple, TypeVar, Union
+from enum import Enum, auto, unique
+from typing import Callable, Iterable, List, Sequence, Tuple, TypeVar, Union
 
 from infra.nla import dict_std_en
 from infra.stats import Stats, calc_stats
@@ -117,46 +117,29 @@ def transpose(strings: Sequence[str]) -> Tuple[str, ...]:
     return tuple("".join(column[x] for column in strings) for x in range(first_length))
 
 
+class GridPathOrigin(Enum):
+    """Where to start a path walk."""
+
+    TopLeft = auto()
+    TopRight = auto()
+    BottomRight = auto()
+    BottomLeft = auto()
+
+
 class GridPath(Enum):
     """The possible paths when walking a grid."""
 
-    HORIZONTALS_STRAIGHT_TL = auto()
-    HORIZONTALS_STRAIGHT_BL = auto()
-    HORIZONTALS_REVERSE_TR = auto()
-    HORIZONTALS_REVERSE_BR = auto()
-    HORIZONTALS_ALTERNATE_TL = auto()
-    HORIZONTALS_ALTERNATE_TR = auto()
-    HORIZONTALS_ALTERNATE_BR = auto()
-    HORIZONTALS_ALTERNATE_BL = auto()
+    Rows = auto()
+    SnakeRows = auto()
 
-    VERTICALS_DESCENDING_TL = auto()
-    VERTICALS_DESCENDING_TR = auto()
-    VERTICALS_ASCENDING_BL = auto()
-    VERTICALS_ASCENDING_BR = auto()
-    VERTICALS_ALTERNATE_TL = auto()
-    VERTICALS_ALTERNATE_TR = auto()
-    VERTICALS_ALTERNATE_BR = auto()
-    VERTICALS_ALTERNATE_BL = auto()
+    Columns = auto()
+    SnakeColumns = auto()
 
-    SPIRAL_CLOCKWISE_IN_TL = auto()
-    SPIRAL_CLOCKWISE_IN_TR = auto()
-    SPIRAL_CLOCKWISE_IN_BR = auto()
-    SPIRAL_CLOCKWISE_IN_BL = auto()
+    SpiralCwIn = auto()
+    SpiralCcwIn = auto()
 
-    SPIRAL_ANTICLOCKWISE_IN_TL = auto()
-    SPIRAL_ANTICLOCKWISE_IN_TR = auto()
-    SPIRAL_ANTICLOCKWISE_IN_BR = auto()
-    SPIRAL_ANTICLOCKWISE_IN_BL = auto()
-
-    SPIRAL_CLOCKWISE_OUT_TL = auto()
-    SPIRAL_CLOCKWISE_OUT_TR = auto()
-    SPIRAL_CLOCKWISE_OUT_BR = auto()
-    SPIRAL_CLOCKWISE_OUT_BL = auto()
-
-    SPIRAL_ANTICLOCKWISE_OUT_TL = auto()
-    SPIRAL_ANTICLOCKWISE_OUT_TR = auto()
-    SPIRAL_ANTICLOCKWISE_OUT_BR = auto()
-    SPIRAL_ANTICLOCKWISE_OUT_BL = auto()
+    SpiralCwOut = auto()
+    SpiralCcwOut = auto()
 
 
 def create_grid(rows: int, cols: int, default: T) -> List[List[T]]:
@@ -174,205 +157,160 @@ def create_grid(rows: int, cols: int, default: T) -> List[List[T]]:
     return [[default] * cols for _ in range(rows)]
 
 
-def walk_path(
-    path: GridPath,
-    rows: int,
-    cols: int,
-    action: Callable[[int, int], None],
-    action_reverse: Callable[[int, int], None],
-):
-    """
-    Execute actions while walking over a grid.
-
-    :param path: The path to follow.
-    :param rows: Rows in the grid.
-    :param cols: Columns in the grid.
-    :param action: What to do when visiting a cell; "inwards" if on a spiral path.
-    :param action_reverse: What to do when visiting a cell; "outwards" if on a spiral path,
-           and only relevant for spiral paths.
-    """
+@unique
+class _WalkDirection(Enum):
     dir_up = 0
     dir_right = 1
     dir_down = 2
     dir_left = 3
 
-    def rotate_cw(d: int) -> int:
-        return (d + 1) % 4
 
-    def rotate_ccw(d: int) -> int:
-        return (d + 3) % 4
+def _spiral_path(
+    rows: int,
+    cols: int,
+    y0: int,
+    x0: int,
+    direction: _WalkDirection,
+    rotate: Callable[[_WalkDirection], _WalkDirection],
+) -> Iterable[Tuple[int, int]]:
+    """
+    Get the coordinates when walking a spiral.
 
-    def dir_to_dy(d: int) -> int:
-        if d == dir_up:
+    :param rows: Grid rows.
+    :param cols: Grid columns.
+    :param y0: Starting row.
+    :param x0: Starting column.
+    :param direction: Starting direction.
+    :param rotate: Called when the direction needs to be changed.
+    :return: An iterable of (y,x) coordinates.
+    """
+
+    def dir_to_dy(d: _WalkDirection) -> int:
+        if d == _WalkDirection.dir_up:
             return -1
-        elif d == dir_down:
+        elif d == _WalkDirection.dir_down:
             return 1
         else:
             return 0
 
-    def dir_to_dx(d: int) -> int:
-        if d == dir_left:
+    def dir_to_dx(d: _WalkDirection) -> int:
+        if d == _WalkDirection.dir_left:
             return -1
-        elif d == dir_right:
+        elif d == _WalkDirection.dir_right:
             return 1
         else:
             return 0
 
-    marker_grid = create_grid(rows, cols, False)
+    visited = create_grid(rows, cols, False)
+    y, x = y0, x0
 
-    def walk_spiral(
-        y: int,
-        x: int,
-        direction: int,
-        rotate: Callable[[int], int],
-        action: Callable[[int, int], None],
-    ):
-        for _ in range(1, rows * cols):
-            assert not marker_grid[y][x]
+    for _ in range(1, rows * cols):
+        assert not visited[y][x]
+        visited[y][x] = True
+        yield y, x
+
+        nx = x + dir_to_dx(direction)
+        ny = y + dir_to_dy(direction)
+        if not (0 <= ny < rows) or not (0 <= nx < cols) or visited[ny][nx]:
+            direction = rotate(direction)
+        y += dir_to_dy(direction)
+        x += dir_to_dx(direction)
+    yield y, x
+
+
+def walk_path(
+    path: GridPath,
+    origin: GridPathOrigin,
+    rows: int,
+    cols: int,
+    action: Callable[[int, int], None],
+):
+    """
+    Execute actions while walking over a grid.
+
+    :param path: The path to follow.
+    :param origin: Where to start walking.
+    :param rows: Rows in the grid.
+    :param cols: Columns in the grid.
+    :param action: What to do when visiting a cell; "inwards" if on a spiral path.
+    """
+
+    def rotate_cw(d: _WalkDirection) -> _WalkDirection:
+        return _WalkDirection((d.value + 1) % 4)
+
+    def rotate_ccw(d: _WalkDirection) -> _WalkDirection:
+        return _WalkDirection((d.value + 3) % 4)
+
+    def origin_range(n: int, *origins: GridPathOrigin) -> Iterable[int]:
+        return range(n) if origin in origins else reverse_sequence(n)
+
+    if path == GridPath.Rows:
+        for r in origin_range(rows, GridPathOrigin.TopLeft, GridPathOrigin.TopRight):
+            for c in origin_range(cols, GridPathOrigin.TopLeft, GridPathOrigin.BottomLeft):
+                action(r, c)
+    elif path == GridPath.SnakeRows:
+        forward = origin in (GridPathOrigin.TopLeft, GridPathOrigin.BottomLeft)
+        for r in origin_range(rows, GridPathOrigin.TopLeft, GridPathOrigin.TopRight):
+            for c in range(cols) if forward else reverse_sequence(cols):
+                action(r, c)
+            forward = not forward
+    elif path == GridPath.Columns:
+        for c in origin_range(cols, GridPathOrigin.TopLeft, GridPathOrigin.BottomLeft):
+            for r in origin_range(rows, GridPathOrigin.TopLeft, GridPathOrigin.TopRight):
+                action(r, c)
+    elif path == GridPath.SnakeColumns:
+        forward = origin in (GridPathOrigin.TopLeft, GridPathOrigin.TopRight)
+        for c in origin_range(cols, GridPathOrigin.TopLeft, GridPathOrigin.BottomLeft):
+            for r in range(rows) if forward else reverse_sequence(rows):
+                action(r, c)
+            forward = not forward
+    elif path in (GridPath.SpiralCwIn, GridPath.SpiralCwOut):
+
+        def reverse_if_out(coords: Iterable[Tuple[int, int]]) -> Iterable[Tuple[int, int]]:
+            return coords if path == GridPath.SpiralCwOut else reversed(tuple(coords))
+
+        for y, x in reverse_if_out(
+            _spiral_path(
+                rows,
+                cols,
+                0 if origin in (GridPathOrigin.TopLeft, GridPathOrigin.TopRight) else rows - 1,
+                0 if origin in (GridPathOrigin.TopLeft, GridPathOrigin.BottomLeft) else cols - 1,
+                {
+                    GridPathOrigin.TopLeft: _WalkDirection.dir_right,
+                    GridPathOrigin.TopRight: _WalkDirection.dir_down,
+                    GridPathOrigin.BottomRight: _WalkDirection.dir_left,
+                    GridPathOrigin.BottomLeft: _WalkDirection.dir_up,
+                }[origin],
+                rotate_cw,
+            ),
+        ):
             action(y, x)
-            marker_grid[y][x] = True
+    elif path in (GridPath.SpiralCcwIn, GridPath.SpiralCcwOut):
 
-            nx = x + dir_to_dx(direction)
-            ny = y + dir_to_dy(direction)
-            if not (0 <= ny < rows) or not (0 <= nx < cols) or marker_grid[ny][nx]:
-                direction = rotate(direction)
-            y += dir_to_dy(direction)
-            x += dir_to_dx(direction)
-        action(y, x)
+        def reverse_if_out(coords: Iterable[Tuple[int, int]]) -> Iterable[Tuple[int, int]]:
+            return coords if path == GridPath.SpiralCcwOut else reversed(tuple(coords))
 
-    if path == GridPath.HORIZONTALS_STRAIGHT_TL:
-        for r in range(rows):
-            for c in range(cols):
-                action(r, c)
-    elif path == GridPath.HORIZONTALS_STRAIGHT_BL:
-        for r in reverse_sequence(rows):
-            for c in range(cols):
-                action(r, c)
-    elif path == GridPath.HORIZONTALS_REVERSE_TR:
-        for r in range(rows):
-            for c in reverse_sequence(cols):
-                action(r, c)
-    elif path == GridPath.HORIZONTALS_REVERSE_BR:
-        for r in reverse_sequence(rows):
-            for c in reverse_sequence(cols):
-                action(r, c)
-    elif path == GridPath.HORIZONTALS_ALTERNATE_TL:
-        for r in range(rows):
-            if ((r + 1) % 2) != 0:
-                for c in range(cols):
-                    action(r, c)
-            else:
-                for c in reverse_sequence(cols):
-                    action(r, c)
-    elif path == GridPath.HORIZONTALS_ALTERNATE_TR:
-        for r in range(rows):
-            if (r % 2) != 0:
-                for c in range(cols):
-                    action(r, c)
-            else:
-                for c in reverse_sequence(cols):
-                    action(r, c)
-    elif path == GridPath.HORIZONTALS_ALTERNATE_BL:
-        for r in reverse_sequence(rows):
-            if ((rows - r) % 2) != 0:
-                for c in range(cols):
-                    action(r, c)
-            else:
-                for c in reverse_sequence(cols):
-                    action(r, c)
-    elif path == GridPath.HORIZONTALS_ALTERNATE_BR:
-        for r in reverse_sequence(rows):
-            if ((rows - r + 1) % 2) != 0:
-                for c in range(cols):
-                    action(r, c)
-            else:
-                for c in reverse_sequence(cols):
-                    action(r, c)
-    elif path == GridPath.VERTICALS_DESCENDING_TL:
-        for c in range(cols):
-            for r in range(rows):
-                action(r, c)
-    elif path == GridPath.VERTICALS_DESCENDING_TR:
-        for c in reverse_sequence(cols):
-            for r in range(rows):
-                action(r, c)
-    elif path == GridPath.VERTICALS_ASCENDING_BL:
-        for c in range(cols):
-            for r in reverse_sequence(rows):
-                action(r, c)
-    elif path == GridPath.VERTICALS_ASCENDING_BR:
-        for c in reverse_sequence(cols):
-            for r in reverse_sequence(rows):
-                action(r, c)
-    elif path == GridPath.VERTICALS_ALTERNATE_TL:
-        for c in range(cols):
-            if ((c + 1) % 2) != 0:
-                for r in range(rows):
-                    action(r, c)
-            else:
-                for r in reverse_sequence(rows):
-                    action(r, c)
-    elif path == GridPath.VERTICALS_ALTERNATE_BL:
-        for c in range(cols):
-            if (c % 2) != 0:
-                for r in range(rows):
-                    action(r, c)
-            else:
-                for r in reverse_sequence(rows):
-                    action(r, c)
-    elif path == GridPath.VERTICALS_ALTERNATE_TR:
-        for c in reverse_sequence(cols):
-            if ((cols - c) % 2) != 0:
-                for r in range(rows):
-                    action(r, c)
-            else:
-                for r in reverse_sequence(rows):
-                    action(r, c)
-    elif path == GridPath.VERTICALS_ALTERNATE_BR:
-        for c in reverse_sequence(cols):
-            if ((cols - c + 1) % 2) != 0:
-                for r in range(rows):
-                    action(r, c)
-            else:
-                for r in reverse_sequence(rows):
-                    action(r, c)
-    elif path == GridPath.SPIRAL_CLOCKWISE_IN_TL:
-        walk_spiral(0, 0, dir_right, rotate_cw, action)
-    elif path == GridPath.SPIRAL_CLOCKWISE_IN_TR:
-        walk_spiral(0, cols - 1, dir_down, rotate_cw, action)
-    elif path == GridPath.SPIRAL_CLOCKWISE_IN_BR:
-        walk_spiral(rows - 1, cols - 1, dir_left, rotate_cw, action)
-    elif path == GridPath.SPIRAL_CLOCKWISE_IN_BL:
-        walk_spiral(rows - 1, 0, dir_up, rotate_cw, action)
-    elif path == GridPath.SPIRAL_ANTICLOCKWISE_IN_TL:
-        walk_spiral(0, 0, dir_down, rotate_ccw, action)
-    elif path == GridPath.SPIRAL_ANTICLOCKWISE_IN_TR:
-        walk_spiral(0, cols - 1, dir_left, rotate_ccw, action)
-    elif path == GridPath.SPIRAL_ANTICLOCKWISE_IN_BR:
-        walk_spiral(rows - 1, cols - 1, dir_up, rotate_ccw, action)
-    elif path == GridPath.SPIRAL_ANTICLOCKWISE_IN_BL:
-        walk_spiral(rows - 1, 0, dir_right, rotate_ccw, action)
-    elif path == GridPath.SPIRAL_ANTICLOCKWISE_OUT_TL:
-        walk_spiral(0, 0, dir_right, rotate_cw, action_reverse)
-    elif path == GridPath.SPIRAL_ANTICLOCKWISE_OUT_TR:
-        walk_spiral(0, cols - 1, dir_down, rotate_cw, action_reverse)
-    elif path == GridPath.SPIRAL_ANTICLOCKWISE_OUT_BR:
-        walk_spiral(rows - 1, cols - 1, dir_left, rotate_cw, action_reverse)
-    elif path == GridPath.SPIRAL_ANTICLOCKWISE_OUT_BL:
-        walk_spiral(rows - 1, 0, dir_up, rotate_cw, action_reverse)
-    elif path == GridPath.SPIRAL_CLOCKWISE_OUT_TL:
-        walk_spiral(0, 0, dir_down, rotate_ccw, action_reverse)
-    elif path == GridPath.SPIRAL_CLOCKWISE_OUT_TR:
-        walk_spiral(0, cols - 1, dir_left, rotate_ccw, action_reverse)
-    elif path == GridPath.SPIRAL_CLOCKWISE_OUT_BR:
-        walk_spiral(rows - 1, cols - 1, dir_up, rotate_ccw, action_reverse)
-    elif path == GridPath.SPIRAL_CLOCKWISE_OUT_BL:
-        walk_spiral(rows - 1, 0, dir_right, rotate_ccw, action_reverse)
+        for y, x in reverse_if_out(
+            _spiral_path(
+                rows,
+                cols,
+                0 if origin in (GridPathOrigin.TopLeft, GridPathOrigin.TopRight) else rows - 1,
+                0 if origin in (GridPathOrigin.TopLeft, GridPathOrigin.BottomLeft) else cols - 1,
+                {
+                    GridPathOrigin.TopLeft: _WalkDirection.dir_down,
+                    GridPathOrigin.TopRight: _WalkDirection.dir_left,
+                    GridPathOrigin.BottomRight: _WalkDirection.dir_up,
+                    GridPathOrigin.BottomLeft: _WalkDirection.dir_right,
+                }[origin],
+                rotate_ccw,
+            ),
+        ):
+            action(y, x)
     else:
         raise ValueError
 
 
-def text_to_grid(rows: int, cols: int, text: str, path: GridPath) -> List[List[str]]:
+def text_to_grid(rows: int, cols: int, text: str, path: GridPath, origin: GridPathOrigin) -> List[List[str]]:
     """
     Write text into a grid.
 
@@ -380,46 +318,36 @@ def text_to_grid(rows: int, cols: int, text: str, path: GridPath) -> List[List[s
     :param cols: The grid columns.
     :param text: The text to write into the grid.
     :param path: The path to follow when writing the characters.
+    :param origin: Where to start walking.
     :return: The grid.
     """
     grid = create_grid(rows, cols, " ")
     text_iter = iter(text)
-    rev_text_iter = iter(text[::-1])
 
     def action(y, x):
         grid[y][x] = next(text_iter)
 
-    def rev_action(r, c):
-        grid[r][c] = next(rev_text_iter)
-
-    walk_path(path, rows, cols, action, rev_action)
+    walk_path(path, origin, rows, cols, action)
 
     return grid
 
 
-def grid_to_text(grid: List[List[str]], path: GridPath) -> str:
+def grid_to_text(grid: List[List[str]], path: GridPath, origin: GridPathOrigin) -> str:
     """
     Convert a grid to text.
 
     :param grid: The grid to convert.
     :param path: The path to use when reading the characters from the grid.
+    :param origin: Where to start walking.
     :return: The text.
     """
-    text = [" "] * len(grid) * len(grid[0])
-    pos = 0
-    end_pos = len(text) - 1
+    text = ""
 
-    def action(r, c):
-        nonlocal pos
-        text[pos] = grid[r][c]
-        pos += 1
+    def action(y, x):
+        nonlocal text
+        text += grid[y][x]
 
-    def rev_action(r, c):
-        nonlocal end_pos
-        text[end_pos] = grid[r][c]
-        end_pos -= 1
-
-    walk_path(path, len(grid), len(grid[0]), action, rev_action)
+    walk_path(path, origin, len(grid), len(grid[0]), action)
 
     return "".join(text)
 
@@ -429,7 +357,9 @@ def transform_text_with_grid(
     cols: int,
     text: str,
     output_path: GridPath,
+    output_origin: GridPathOrigin,
     input_path: GridPath,
+    input_origin: GridPathOrigin,
     null_char: str = "_",
 ) -> str:
     """
@@ -439,7 +369,9 @@ def transform_text_with_grid(
     :param cols: Grid columns.
     :param text: Text to transform.
     :param output_path: How to write the initial text into the grid.
+    :param output_origin: Where to start walking when writing text into the grid.
     :param input_path: How to read the text back from the grid.
+    :param input_origin: Where to start walking when reading text from the grid.
     :param null_char: A characters inserted if there's too less text to fill the grid.
     :return: The transformed text.
     """
@@ -447,8 +379,8 @@ def transform_text_with_grid(
     result = ""
     for pos in range(0, len(text), grid_size):
         partial = text[pos : pos + grid_size].ljust(grid_size, null_char)
-        grid = text_to_grid(rows, cols, partial, output_path)
-        result += grid_to_text(grid, input_path)
+        grid = text_to_grid(rows, cols, partial, output_path, output_origin)
+        result += grid_to_text(grid, input_path, input_origin)
     return result
 
 
@@ -480,7 +412,7 @@ def find_best_path(
     rows: int,
     cols: int,
     fitness_fn: Callable[[str], float] = word_fitness_en,
-) -> Tuple[float, str, GridPath, GridPath]:
+) -> Tuple[float, str, GridPath, GridPathOrigin, GridPath, GridPathOrigin]:
     """
     Find the best path types for transforming a text through a grid.
 
@@ -503,17 +435,31 @@ def find_best_path(
     best_fitness = 0.0
     best_text = None
     best_input_path = None
+    best_input_origin = None
     best_output_path = None
+    best_output_origin = None
 
     for output_path in GridPath:
-        for input_path in GridPath:
-            transformed = transform_text_with_grid(rows, cols, text, output_path, input_path)
-            current_fitness = fitness_fn(transformed)
-            if current_fitness > best_fitness:
-                best_fitness = current_fitness
-                best_text = transformed
-                best_input_path = input_path
-                best_output_path = output_path
+        for output_origin in GridPathOrigin:
+            for input_path in GridPath:
+                for input_origin in GridPathOrigin:
+                    transformed = transform_text_with_grid(
+                        rows,
+                        cols,
+                        text,
+                        output_path,
+                        output_origin,
+                        input_path,
+                        input_origin,
+                    )
+                    current_fitness = fitness_fn(transformed)
+                    if current_fitness > best_fitness:
+                        best_fitness = current_fitness
+                        best_text = transformed
+                        best_input_path = input_path
+                        best_input_origin = input_origin
+                        best_output_path = output_path
+                        best_output_origin = output_origin
 
     assert best_text is not None
-    return best_fitness, best_text, best_input_path, best_output_path
+    return best_fitness, best_text, best_input_path, best_input_origin, best_output_path, best_output_origin
