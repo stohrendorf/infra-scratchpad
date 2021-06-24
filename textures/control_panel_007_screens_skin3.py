@@ -1,6 +1,6 @@
 """The solution for the code found in control_panel_007_screens_skin3.vtf."""
 
-from infra.binary import binary_decode_multi
+from infra.encodings.binary import binary_decode
 
 control_panel_007_screens_skin3 = (
     "01010011 01101111 01101101 01100101 01110100 01101000",
@@ -17,4 +17,4 @@ control_panel_007_screens_skin3 = (
 
 if __name__ == "__main__":
     for entry in control_panel_007_screens_skin3:
-        print(binary_decode_multi(entry))
+        print(binary_decode(entry))

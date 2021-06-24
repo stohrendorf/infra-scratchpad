@@ -1,6 +1,6 @@
 """The morse code found in wasteland_radio_morse.wav."""
 
-from infra.morse import decode_morse
+from infra.encodings.morse import decode_morse
 
 wasteland_radio_morse = (
     ".-. .- ...- . -. .-.-.- # --- - .... . .-."

@@ -1,6 +1,6 @@
 """The morse code found in Open Sewer radio_broken_001.wav."""
 
-from infra.morse import decode_morse
+from infra.encodings.morse import decode_morse
 
 radio_broken_001 = (
     # start 0:20, end ...

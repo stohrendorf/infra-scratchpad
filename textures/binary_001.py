@@ -1,6 +1,6 @@
 """Solution of the texture used only in infra_ee_binary."""
 
-from infra.binary import binary_decode_multi
+from infra.encodings.binary import binary_decode
 from infra.utils import rotate_right
 
 # these are the first 7 columns, as they repeat over the whole texture
@@ -17,7 +17,7 @@ binary_001 = (
 binary_001_input = "OTHER SIDE"
 
 if __name__ == "__main__":
-    all_decoded = tuple(map(binary_decode_multi, binary_001))
+    all_decoded = tuple(map(binary_decode, binary_001))
 
     for column in all_decoded:
         print(column)

@@ -130,16 +130,25 @@ class GridPath(Enum):
     """The possible paths when walking a grid."""
 
     Rows = auto()
+    """Row by row."""
+
     SnakeRows = auto()
+    """Every second row is walked in reverse."""
 
     Columns = auto()
+    """Column by column."""
     SnakeColumns = auto()
+    """Every second column is walked in reverse."""
 
     SpiralCwIn = auto()
+    """Walk a spiral, inwards, clockwise."""
     SpiralCcwIn = auto()
+    """Walk a spiral, inwards, counter-clockwise."""
 
     SpiralCwOut = auto()
+    """Walk a spiral, outwards, clockwise."""
     SpiralCcwOut = auto()
+    """Walk a spiral, outwards, counter-clockwise."""
 
 
 def create_grid(rows: int, cols: int, default: T) -> List[List[T]]:
@@ -223,8 +232,7 @@ def walk_path(
     origin: GridPathOrigin,
     rows: int,
     cols: int,
-    action: Callable[[int, int], None],
-):
+) -> Iterable[Tuple[int, int]]:
     """
     Execute actions while walking over a grid.
 
@@ -232,7 +240,76 @@ def walk_path(
     :param origin: Where to start walking.
     :param rows: Rows in the grid.
     :param cols: Columns in the grid.
-    :param action: What to do when visiting a cell; "inwards" if on a spiral path.
+    :return: The coordinates on the requested path.
+
+    >>> tuple(walk_path(GridPath.Rows, GridPathOrigin.TopLeft, 3, 3))
+    ((0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2))
+    >>> tuple(walk_path(GridPath.Rows, GridPathOrigin.TopRight, 3, 3))
+    ((0, 2), (0, 1), (0, 0), (1, 2), (1, 1), (1, 0), (2, 2), (2, 1), (2, 0))
+    >>> tuple(walk_path(GridPath.Rows, GridPathOrigin.BottomLeft, 3, 3))
+    ((2, 0), (2, 1), (2, 2), (1, 0), (1, 1), (1, 2), (0, 0), (0, 1), (0, 2))
+    >>> tuple(walk_path(GridPath.Rows, GridPathOrigin.BottomRight, 3, 3))
+    ((2, 2), (2, 1), (2, 0), (1, 2), (1, 1), (1, 0), (0, 2), (0, 1), (0, 0))
+
+    >>> tuple(walk_path(GridPath.SnakeRows, GridPathOrigin.TopLeft, 3, 3))
+    ((0, 0), (0, 1), (0, 2), (1, 2), (1, 1), (1, 0), (2, 0), (2, 1), (2, 2))
+    >>> tuple(walk_path(GridPath.SnakeRows, GridPathOrigin.TopRight, 3, 3))
+    ((0, 2), (0, 1), (0, 0), (1, 0), (1, 1), (1, 2), (2, 2), (2, 1), (2, 0))
+    >>> tuple(walk_path(GridPath.SnakeRows, GridPathOrigin.BottomLeft, 3, 3))
+    ((2, 0), (2, 1), (2, 2), (1, 2), (1, 1), (1, 0), (0, 0), (0, 1), (0, 2))
+    >>> tuple(walk_path(GridPath.SnakeRows, GridPathOrigin.BottomRight, 3, 3))
+    ((2, 2), (2, 1), (2, 0), (1, 0), (1, 1), (1, 2), (0, 2), (0, 1), (0, 0))
+
+    >>> tuple(walk_path(GridPath.Columns, GridPathOrigin.TopLeft, 3, 3))
+    ((0, 0), (1, 0), (2, 0), (0, 1), (1, 1), (2, 1), (0, 2), (1, 2), (2, 2))
+    >>> tuple(walk_path(GridPath.Columns, GridPathOrigin.TopRight, 3, 3))
+    ((0, 2), (1, 2), (2, 2), (0, 1), (1, 1), (2, 1), (0, 0), (1, 0), (2, 0))
+    >>> tuple(walk_path(GridPath.Columns, GridPathOrigin.BottomLeft, 3, 3))
+    ((2, 0), (1, 0), (0, 0), (2, 1), (1, 1), (0, 1), (2, 2), (1, 2), (0, 2))
+    >>> tuple(walk_path(GridPath.Columns, GridPathOrigin.BottomRight, 3, 3))
+    ((2, 2), (1, 2), (0, 2), (2, 1), (1, 1), (0, 1), (2, 0), (1, 0), (0, 0))
+    >>> tuple(walk_path(GridPath.SnakeColumns, GridPathOrigin.TopLeft, 3, 3))
+    ((0, 0), (1, 0), (2, 0), (2, 1), (1, 1), (0, 1), (0, 2), (1, 2), (2, 2))
+    >>> tuple(walk_path(GridPath.SnakeColumns, GridPathOrigin.TopRight, 3, 3))
+    ((0, 2), (1, 2), (2, 2), (2, 1), (1, 1), (0, 1), (0, 0), (1, 0), (2, 0))
+    >>> tuple(walk_path(GridPath.SnakeColumns, GridPathOrigin.BottomLeft, 3, 3))
+    ((2, 0), (1, 0), (0, 0), (0, 1), (1, 1), (2, 1), (2, 2), (1, 2), (0, 2))
+    >>> tuple(walk_path(GridPath.SnakeColumns, GridPathOrigin.BottomRight, 3, 3))
+    ((2, 2), (1, 2), (0, 2), (0, 1), (1, 1), (2, 1), (2, 0), (1, 0), (0, 0))
+
+    >>> tuple(walk_path(GridPath.SpiralCwIn, GridPathOrigin.TopLeft, 3, 3))
+    ((0, 0), (0, 1), (0, 2), (1, 2), (2, 2), (2, 1), (2, 0), (1, 0), (1, 1))
+    >>> tuple(walk_path(GridPath.SpiralCwIn, GridPathOrigin.TopRight, 3, 3))
+    ((0, 2), (1, 2), (2, 2), (2, 1), (2, 0), (1, 0), (0, 0), (0, 1), (1, 1))
+    >>> tuple(walk_path(GridPath.SpiralCwIn, GridPathOrigin.BottomLeft, 3, 3))
+    ((2, 0), (1, 0), (0, 0), (0, 1), (0, 2), (1, 2), (2, 2), (2, 1), (1, 1))
+    >>> tuple(walk_path(GridPath.SpiralCwIn, GridPathOrigin.BottomRight, 3, 3))
+    ((2, 2), (2, 1), (2, 0), (1, 0), (0, 0), (0, 1), (0, 2), (1, 2), (1, 1))
+    >>> tuple(walk_path(GridPath.SpiralCcwIn, GridPathOrigin.TopLeft, 3, 3))
+    ((0, 0), (1, 0), (2, 0), (2, 1), (2, 2), (1, 2), (0, 2), (0, 1), (1, 1))
+    >>> tuple(walk_path(GridPath.SpiralCcwIn, GridPathOrigin.TopRight, 3, 3))
+    ((0, 2), (0, 1), (0, 0), (1, 0), (2, 0), (2, 1), (2, 2), (1, 2), (1, 1))
+    >>> tuple(walk_path(GridPath.SpiralCcwIn, GridPathOrigin.BottomLeft, 3, 3))
+    ((2, 0), (2, 1), (2, 2), (1, 2), (0, 2), (0, 1), (0, 0), (1, 0), (1, 1))
+    >>> tuple(walk_path(GridPath.SpiralCcwIn, GridPathOrigin.BottomRight, 3, 3))
+    ((2, 2), (1, 2), (0, 2), (0, 1), (0, 0), (1, 0), (2, 0), (2, 1), (1, 1))
+
+    >>> tuple(walk_path(GridPath.SpiralCwOut, GridPathOrigin.TopLeft, 3, 3))
+    ((1, 1), (1, 0), (2, 0), (2, 1), (2, 2), (1, 2), (0, 2), (0, 1), (0, 0))
+    >>> tuple(walk_path(GridPath.SpiralCwOut, GridPathOrigin.TopRight, 3, 3))
+    ((1, 1), (0, 1), (0, 0), (1, 0), (2, 0), (2, 1), (2, 2), (1, 2), (0, 2))
+    >>> tuple(walk_path(GridPath.SpiralCwOut, GridPathOrigin.BottomLeft, 3, 3))
+    ((1, 1), (2, 1), (2, 2), (1, 2), (0, 2), (0, 1), (0, 0), (1, 0), (2, 0))
+    >>> tuple(walk_path(GridPath.SpiralCwOut, GridPathOrigin.BottomRight, 3, 3))
+    ((1, 1), (1, 2), (0, 2), (0, 1), (0, 0), (1, 0), (2, 0), (2, 1), (2, 2))
+    >>> tuple(walk_path(GridPath.SpiralCcwOut, GridPathOrigin.TopLeft, 3, 3))
+    ((1, 1), (0, 1), (0, 2), (1, 2), (2, 2), (2, 1), (2, 0), (1, 0), (0, 0))
+    >>> tuple(walk_path(GridPath.SpiralCcwOut, GridPathOrigin.TopRight, 3, 3))
+    ((1, 1), (1, 2), (2, 2), (2, 1), (2, 0), (1, 0), (0, 0), (0, 1), (0, 2))
+    >>> tuple(walk_path(GridPath.SpiralCcwOut, GridPathOrigin.BottomLeft, 3, 3))
+    ((1, 1), (1, 0), (0, 0), (0, 1), (0, 2), (1, 2), (2, 2), (2, 1), (2, 0))
+    >>> tuple(walk_path(GridPath.SpiralCcwOut, GridPathOrigin.BottomRight, 3, 3))
+    ((1, 1), (2, 1), (2, 0), (1, 0), (0, 0), (0, 1), (0, 2), (1, 2), (2, 2))
     """
 
     def rotate_cw(d: _WalkDirection) -> _WalkDirection:
@@ -247,29 +324,29 @@ def walk_path(
     if path == GridPath.Rows:
         for r in origin_range(rows, GridPathOrigin.TopLeft, GridPathOrigin.TopRight):
             for c in origin_range(cols, GridPathOrigin.TopLeft, GridPathOrigin.BottomLeft):
-                action(r, c)
+                yield r, c
     elif path == GridPath.SnakeRows:
         forward = origin in (GridPathOrigin.TopLeft, GridPathOrigin.BottomLeft)
         for r in origin_range(rows, GridPathOrigin.TopLeft, GridPathOrigin.TopRight):
             for c in range(cols) if forward else reverse_sequence(cols):
-                action(r, c)
+                yield r, c
             forward = not forward
     elif path == GridPath.Columns:
         for c in origin_range(cols, GridPathOrigin.TopLeft, GridPathOrigin.BottomLeft):
             for r in origin_range(rows, GridPathOrigin.TopLeft, GridPathOrigin.TopRight):
-                action(r, c)
+                yield r, c
     elif path == GridPath.SnakeColumns:
         forward = origin in (GridPathOrigin.TopLeft, GridPathOrigin.TopRight)
         for c in origin_range(cols, GridPathOrigin.TopLeft, GridPathOrigin.BottomLeft):
             for r in range(rows) if forward else reverse_sequence(rows):
-                action(r, c)
+                yield r, c
             forward = not forward
     elif path in (GridPath.SpiralCwIn, GridPath.SpiralCwOut):
 
         def reverse_if_out(coords: Iterable[Tuple[int, int]]) -> Iterable[Tuple[int, int]]:
-            return coords if path == GridPath.SpiralCwOut else reversed(tuple(coords))
+            return coords if path != GridPath.SpiralCwOut else reversed(tuple(coords))
 
-        for y, x in reverse_if_out(
+        yield from reverse_if_out(
             _spiral_path(
                 rows,
                 cols,
@@ -283,14 +360,13 @@ def walk_path(
                 }[origin],
                 rotate_cw,
             ),
-        ):
-            action(y, x)
+        )
     elif path in (GridPath.SpiralCcwIn, GridPath.SpiralCcwOut):
 
         def reverse_if_out(coords: Iterable[Tuple[int, int]]) -> Iterable[Tuple[int, int]]:
-            return coords if path == GridPath.SpiralCcwOut else reversed(tuple(coords))
+            return coords if path != GridPath.SpiralCcwOut else reversed(tuple(coords))
 
-        for y, x in reverse_if_out(
+        yield from reverse_if_out(
             _spiral_path(
                 rows,
                 cols,
@@ -304,8 +380,7 @@ def walk_path(
                 }[origin],
                 rotate_ccw,
             ),
-        ):
-            action(y, x)
+        )
     else:
         raise ValueError
 
@@ -320,14 +395,15 @@ def text_to_grid(rows: int, cols: int, text: str, path: GridPath, origin: GridPa
     :param path: The path to follow when writing the characters.
     :param origin: Where to start walking.
     :return: The grid.
+
+    >>> text_to_grid(3, 3, "ABCDEFGHI", GridPath.SpiralCwIn, GridPathOrigin.BottomRight)
+    [['E', 'F', 'G'], ['D', 'I', 'H'], ['C', 'B', 'A']]
     """
     grid = create_grid(rows, cols, " ")
     text_iter = iter(text)
 
-    def action(y, x):
+    for y, x in walk_path(path, origin, rows, cols):
         grid[y][x] = next(text_iter)
-
-    walk_path(path, origin, rows, cols, action)
 
     return grid
 
@@ -340,16 +416,12 @@ def grid_to_text(grid: List[List[str]], path: GridPath, origin: GridPathOrigin) 
     :param path: The path to use when reading the characters from the grid.
     :param origin: Where to start walking.
     :return: The text.
+
+    >>> grid_to_text(
+    ...     [['E', 'F', 'G'], ['D', 'I', 'H'], ['C', 'B', 'A']], GridPath.SpiralCwIn, GridPathOrigin.BottomRight)
+    'ABCDEFGHI'
     """
-    text = ""
-
-    def action(y, x):
-        nonlocal text
-        text += grid[y][x]
-
-    walk_path(path, origin, len(grid), len(grid[0]), action)
-
-    return "".join(text)
+    return "".join(grid[y][x] for y, x in walk_path(path, origin, len(grid), len(grid[0])))
 
 
 def transform_text_with_grid(

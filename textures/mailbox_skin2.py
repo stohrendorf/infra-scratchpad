@@ -1,6 +1,6 @@
 """The solution for the code found in mailbox_skin2.vtf."""
 
-from infra.binary import binary_decode_multi
+from infra.encodings.binary import binary_decode
 from infra.string import insert_spaces
 
 mailbox_skin2 = (
@@ -15,4 +15,4 @@ mailbox_skin2 = (
 
 if __name__ == "__main__":
     for entry in mailbox_skin2:
-        print(binary_decode_multi(insert_spaces(entry, 8)))
+        print(binary_decode(insert_spaces(entry, 8)))

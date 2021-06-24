@@ -1,6 +1,6 @@
 """Random riddles posted on discord which are not present in INFRA itself."""
 
-from infra.binary import binary_decode, invert_bits
+from infra.encodings.binary import binary_decode, invert_bits
 from infra.utils import convert_base
 
 
