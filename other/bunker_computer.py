@@ -2,6 +2,7 @@
 
 from typing import Dict, Tuple
 
+from infra.ciphers.transposition import transposed
 from other.body_message import body_code
 
 bunker_computer_code_1 = (
@@ -145,3 +146,5 @@ def _print_non_unique_code_usage_part_3():
 if __name__ == "__main__":
     print(_decrypt_bunker_computer_code_2())
     _print_non_unique_code_usage_part_3()
+    for column in transposed(bunker_computer_code_1):
+        print("".join(word[0] for word in column))
