@@ -108,23 +108,27 @@ def columnar_decode(encoded: str, key: str) -> str:
     return "".join(column[i] for i in range(rows) for column in columns if i < len(column))
 
 
-def transpose(strings: Sequence[str]) -> Tuple[str, ...]:
+def transposed(grid: Sequence[T]) -> Tuple[T, ...]:
     """
     Transpose a list of strings.
 
-    :param strings: The strings to transpose.
+    :param grid: The strings to transpose.
     :return: The transposed strings.
 
-    >>> transpose(("HELLO", "WORLD"))
+    >>> transposed(("HELLO", "WORLD"))
     ('HW', 'EO', 'LR', 'LL', 'OD')
     """
-    if not strings:
+    if not grid:
         return ()
 
-    first_length = len(strings[0])
-    assert all(first_length == len(s) for s in strings)
+    first_length = len(grid[0])
+    assert all(first_length == len(s) for s in grid)
 
-    return tuple("".join(column[x] for column in strings) for x in range(first_length))
+    is_string_grid = isinstance(grid[0], str)
+    return tuple(
+        "".join(column[x] for column in grid) if is_string_grid else tuple(column[x] for column in grid)
+        for x in range(first_length)
+    )
 
 
 class GridPathOrigin(Enum):
