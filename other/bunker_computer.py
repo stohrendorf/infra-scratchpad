@@ -44,46 +44,70 @@ bunker_computer_code_2 = (
 bunker_computer_code_2_solution = "WHATCONNECTSALLTHESE"
 
 bunker_computer_code_3 = (
-    "1.3",
-    "1.1",
-    "4.10",
-    "1.7",
-    "4.7",
-    "1.5",
-    "2.8",
-    "2.5",
-    "4.3",
-    "4.4",
-    "4.5",
-    "4.6",
-    "2.4",
-    "3.8",
-    "1.2",
-    "3.2",
-    "4.1",
-    "4.2",
-    "2.7",
-    "3.7",
-    "1.4",
-    "2.2",
-    "2.6",
-    "3.1",
-    "1.8",
-    "1.10",
-    "1.9",
-    "2.10",
-    "3.6",
-    "3.9",
-    "3.10",
-    "2.1",
-    "3.3",
-    "1.6",
-    "2.9",
-    "4.8",
-    "2.4",
-    "4.9",
-    "2.3",
-    "3.5",
+    (
+        (
+            "1.3",
+            "1.1",
+            "4.10",
+            "1.7",
+            "4.7",
+        ),
+        (
+            "1.5",
+            "2.8",
+            "2.5",
+            "4.3",
+            "4.4",
+        ),
+    ),
+    (
+        (
+            "4.5",
+            "4.6",
+            "2.4",
+            "3.8",
+            "1.2",
+        ),
+        (
+            "3.2",
+            "4.1",
+            "4.2",
+            "2.7",
+            "3.7",
+        ),
+    ),
+    (
+        (
+            "1.4",
+            "2.2",
+            "2.6",
+            "3.1",
+            "1.8",
+        ),
+        (
+            "1.10",
+            "1.9",
+            "2.10",
+            "3.6",
+            "3.9",
+        ),
+    ),
+    (
+        (
+            "3.10",
+            "2.1",
+            "3.3",
+            "1.6",
+            "2.9",
+        ),
+        (
+            "4.8",
+            "2.4",
+            "4.9",
+            "2.3",
+            "3.5",
+        ),
+    ),
 )
 
 
@@ -103,8 +127,10 @@ bunker_computer_code_2_solution_unpatched = _decrypt_bunker_computer_code_2()
 
 def _count_usages(data: Tuple[Tuple[str, ...], ...]) -> Dict[str, int]:
     result = {f"{x + 1}.{y + 1}": 0 for y, y_data in enumerate(data) for x in range(len(y_data))}
-    for code in bunker_computer_code_3:
-        result[code] += 1
+    for row in bunker_computer_code_3:
+        for column in row:
+            for code in column:
+                result[code] += 1
 
     return result
 

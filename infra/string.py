@@ -1,7 +1,8 @@
 """String-related utility functions."""
 
-from typing import Iterable, Tuple
+from typing import Iterable, Optional, Tuple
 
+from infra.nla import alphabet_fi
 from infra.utils import split_every
 
 
@@ -23,18 +24,21 @@ def all_string_indices(haystack: str, needle: str) -> Iterable[int]:
             break
 
 
-def char_idx(char: str) -> int:
+def char_idx(char: str) -> Optional[int]:
     """
     Get the index of an uppercase character.
 
     :param char: The input character.
     :return: The index.
 
-    >>> char_idx("A"), char_idx("B")
-    (1, 2)
+    >>> char_idx("A"), char_idx("B"), char_idx("Ä"), char_idx("-")
+    (0, 1, 27, None)
     """
     assert len(char) == 1
-    return ord(char) - ord("A") + 1
+    try:
+        return alphabet_fi.index(char)
+    except ValueError:
+        return None
 
 
 def insert_spaces(string: str, every: int) -> str:

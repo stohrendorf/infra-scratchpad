@@ -8,7 +8,7 @@ from infra.string import all_string_indices, split_every
 from infra.utils import reverse_sequence
 
 
-def get_encoding_mapping(key: str) -> Tuple[int]:
+def get_encoding_mapping(key: str) -> Tuple[int, ...]:
     """
     Compute the encoding mapping for columnar transposition ciphers.
 
@@ -20,6 +20,19 @@ def get_encoding_mapping(key: str) -> Tuple[int]:
     """
     key_chars = sorted(set(key))
     return tuple(src_idx for key_char in key_chars for src_idx in all_string_indices(key, key_char))
+
+
+def get_decoding_mapping(key: str) -> Tuple[int, ...]:
+    """
+    Compute the decoding mapping for columnar transposition ciphers.
+
+    :param key: The decoding key.
+    :return: The column indices resulting from the encoding key.
+
+    >>> get_decoding_mapping("ALBERT")
+    (0, 3, 1, 2, 4, 5)
+    """
+    return tuple(dst for dst, _ in sorted(enumerate(get_encoding_mapping(key)), key=lambda dst_src: dst_src[1]))
 
 
 T = TypeVar("T")
@@ -75,10 +88,7 @@ def columnar_decode_shuffle(data: IndexableT, key: str) -> IndexableT:
     'HELLOWORLD'
     """
     assert len(data) == len(key)
-    decoding_mapping = tuple(
-        dst for dst, _ in sorted(enumerate(get_encoding_mapping(key)), key=lambda dst_src: dst_src[1])
-    )
-    return [data[src_idx] for src_idx in decoding_mapping]
+    return [data[src_idx] for src_idx in get_decoding_mapping(key)]
 
 
 def columnar_decode(encoded: str, key: str) -> str:
