@@ -148,3 +148,11 @@ if __name__ == "__main__":
     _print_non_unique_code_usage_part_3()
     for column in transposed(bunker_computer_code_1):
         print("".join(word[0] for word in column))
+
+    def _get_word(co: str):
+        x, y = co.split(".")
+        return bunker_computer_code_1[int(y) - 1][int(x) - 1]
+
+    for row in bunker_computer_code_3:
+        for column in row:
+            print(" ".join(map(_get_word, column)))
