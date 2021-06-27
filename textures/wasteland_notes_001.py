@@ -151,7 +151,7 @@ def _decode_wasteland_message(key: Dict[str, str], message: Iterable[str], with_
             decoded = key[prefix][int(index) - 1]
             return f"{decoded}={word}" if with_code else decoded
         except IndexError:
-            return word
+            return f"[{word}]"
 
     lines = "\n    ".join("".join(map(decode_word, line.split())).replace("#", " ") for line in message)
     return lines
