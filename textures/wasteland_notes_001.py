@@ -1,6 +1,5 @@
 """The solution of https://stalburg.net/Wasteland_notes."""
 
-from collections import defaultdict
 from typing import Dict, Iterable
 
 from other.bunker_computer import bunker_computer_code_2_solution
@@ -248,24 +247,26 @@ def _decode_wasteland_message(key: Dict[str, str], message: Iterable[str], with_
     return lines
 
 
-def _clean_unreferenced_key_chars(key: Dict[str, str], messages: Iterable[Iterable[str]]) -> Dict[str, str]:
-    used = defaultdict(set)
+def _count_code_usage(messages: Iterable[Iterable[str]]) -> Dict[str, int]:
+    usage = dict()
     for message in messages:
         for line in message:
             for word in line.split():
-                if "." not in word:
-                    continue
+                if "." in word:
+                    usage[word] = usage.get(word, 0) + 1
+    return usage
 
-                prefix, index = word.split(".")
-                used[prefix].add(int(index) - 1)
+
+def _clean_unreferenced_key_chars(key: Dict[str, str], messages: Iterable[Iterable[str]]) -> Dict[str, str]:
+    usage = _count_code_usage(messages)
 
     key = key.copy()
-    for used_key, used_indices in used.items():
-        real_key = key[used_key]
-        for i in range(len(real_key)):
-            if i not in used_indices:
-                real_key = real_key[:i] + "_" + real_key[i + 1 :]
-        key[used_key] = real_key
+    for prefix, value in key.items():
+        for i in range(len(value)):
+            code = f"{prefix}.{i+1}"
+            if usage.get(code, 0) <= 0:
+                value = value[:i] + "_" + value[i + 1 :]
+        key[prefix] = value
 
     return key
 
@@ -273,4 +274,5 @@ def _clean_unreferenced_key_chars(key: Dict[str, str], messages: Iterable[Iterab
 if __name__ == "__main__":
     for note in wasteland_notes_001:
         print(_decode_wasteland_message(wasteland_notes_001_key, note))
+    print("code usage counts", _count_code_usage(wasteland_notes_001))
     print("unreferenced key chars", _clean_unreferenced_key_chars(wasteland_notes_001_key, wasteland_notes_001))
