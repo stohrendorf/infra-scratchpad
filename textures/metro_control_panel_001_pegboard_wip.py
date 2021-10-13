@@ -1,136 +1,129 @@
 """A collection of stuff related to https://stalburg.net/Body_message#Pegs."""
-from infra.encodings.binary import binary_decode
-from textures.metro_control_panel_001_pegboard import (metro_control_panel_001_pegboard, _invert_bool_list,
-                                                       _bools_to_binary_str, _bools_to_nor_mask, _pegs_to_bool_list)
+from typing import Callable, Sequence
 
-mp = metro_control_panel_001_pegboard
+from termcolor import colored
+
+from infra.utils import chunked
+from textures.metro_control_panel_001_pegboard import (
+    bools_to_int_be,
+    bools_to_nor_mask,
+    invert_bools,
+    matching_elements,
+    metro_control_panel_001_pegboard,
+    PegGroup,
+)
+
+ColorFunc = Callable[[str], str]
+
+
+def bools_to_ascii_str(bits: Sequence[bool], post_op: ColorFunc = lambda x: x) -> str:
+    """
+    Convert a sequence of bits (booleans) to one ascii character for each byte.
+    Non printing characters are represented like "x1f".
+    Each character or hex code will have a padded width of 3 characters, and
+    a space will be inserted between consecutive characters.
+
+    :param bits: Sequence of booleans as bits to be decoded.
+    :return: String containing the decoded bits.
+    :param post_op: Optional function to be applied to.
+
+    >>> bools_to_ascii_str([False, True, True, False, False, True, False, True])
+    'e  '
+    >>> bools_to_ascii_str([False, False, False, False, True, False, True, False])
+    'x0a'
+    """
+
+    ints = (bools_to_int_be(byte) for byte in chunked(bits, 8))
+
+    return " ".join(f"{x:#04x}"[1:] if not chr(x).isalnum() else f"{post_op(chr(x))}  " for x in ints)
 
 
 if __name__ == "__main__":
-    def transform_pegs(a: str, mask: str, b: str) -> str:
-        a_ = _pegs_to_bool_list(a)
-        mask_ = _bools_to_nor_mask(mask)
-        b_ = _pegs_to_bool_list(b)
-        transformed = [op(first, second) for first, op, second in zip(a_, mask_, b_)]
-        bytes_str = binary_decode(_bools_to_binary_str(transformed))
-        return " ".join(char if 126 > ord(char) > 33 else str(ord(char)) for char in bytes_str)
 
-    def transform_pegs_all_inverted(a: str, mask: str, b: str) -> str:
-        a_ = _invert_bool_list(_pegs_to_bool_list(a))
-        mask_ = _bools_to_nor_mask(mask)
-        b_ = _invert_bool_list(_pegs_to_bool_list(b))
-        transformed = [op(first, second) for first, op, second in zip(a_, mask_, b_)]
-        bytes_str = binary_decode(_bools_to_binary_str(transformed))
-        return " ".join(char if 126 > ord(char) > 33 else str(ord(char)) for char in bytes_str)
+    # Following are some tests applying a nor mask to various combinations of pegs.
 
-    def transform_pegs_top_inverted(a: str, mask: str, b: str) -> str:
-        a_ = _invert_bool_list(_pegs_to_bool_list(a))
-        mask_ = _bools_to_nor_mask(mask)
-        b_ = (_pegs_to_bool_list(b))
-        transformed = [op(first, second) for first, op, second in zip(a_, mask_, b_)]
-        bytes_str = binary_decode(_bools_to_binary_str(transformed))
-        return " ".join(char if 126 > ord(char) > 33 else str(ord(char)) for char in bytes_str)
+    peg_group_names = (("pegs[1,1]", "pegs[1,2]"),
+                       ("pegs[3,1]", "pegs[3,2]"),
+                       ("pegs[4,1]", "pegs[4,2]"))
 
-    def transform_pegs_bottom_inverted(a: str, mask: str, b: str) -> str:
-        a_ = (_pegs_to_bool_list(a))
-        mask_ = _bools_to_nor_mask(mask)
-        b_ = _invert_bool_list(_pegs_to_bool_list(b))
-        transformed = [op(first, second) for first, op, second in zip(a_, mask_, b_)]
-        bytes_str = binary_decode(_bools_to_binary_str(transformed))
-        return " ".join(char if 126 > ord(char) > 33 else str(ord(char)) for char in bytes_str)
+    # Flatten the peg groupings for easier handling.
+    # pegs[1,1]                 pegs[3,1]    pegs[4,1]
+    # pegs[1,2]                 pegs[3,2]    pegs[4,2]
+    peg_groups = []
+    for i, panels in enumerate(metro_control_panel_001_pegboard):
+        for j, peg_str in enumerate(panels):
+            peg_group = PegGroup(
+                # Correcting for the blank panel
+                name=peg_group_names[i][j],
+                pegs=invert_bools(matching_elements(peg_str, "E")),
+                markers=matching_elements(peg_str, "M"),
+            )
+            peg_groups.append(peg_group)
 
-    for panel in metro_control_panel_001_pegboard:
-        # top nor bottom from top markers
-        print(transform_pegs(panel[0],
-                             panel[0],
-                             panel[1]))
+    zeros = [False] * 24
+
+
+    def red_text(text: str):
+        return colored(text, "red")
+
+
+    # Some labeling to help identify interesting results.
     print()
-    for panel in metro_control_panel_001_pegboard:
-        # bottom nor top from top markers
-        print(transform_pegs(panel[1],
-                             panel[0],
-                             panel[0]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # bottom nor top from bottom markers
-        print(transform_pegs(panel[1],
-                             panel[1],
-                             panel[0]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # top nor bottom from bottom markers
-        print(transform_pegs(panel[0],
-                             panel[1],
-                             panel[1]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # top nor bottom from top markers pegs inverted
-        print(transform_pegs_all_inverted(panel[0],
-                                          panel[0],
-                                          panel[1]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # bottom nor top from top markers inverted
-        print(transform_pegs_all_inverted(panel[1],
-                                          panel[0],
-                                          panel[0]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # bottom nor top from bottom markers inverted
-        print(transform_pegs_all_inverted(panel[1],
-                                          panel[1],
-                                          panel[0]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # top nor bottom from bottom markers inverted
-        print(transform_pegs_all_inverted(panel[0],
-                                          panel[1],
-                                          panel[1]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # top nor bottom from top markers pegs inverted
-        print(transform_pegs_top_inverted(panel[0],
-                                          panel[0],
-                                          panel[1]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # bottom nor top from top markers inverted
-        print(transform_pegs_top_inverted(panel[1],
-                                          panel[0],
-                                          panel[0]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # bottom nor top from bottom markers inverted
-        print(transform_pegs_top_inverted(panel[1],
-                                          panel[1],
-                                          panel[0]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # top nor bottom from bottom markers inverted
-        print(transform_pegs_top_inverted(panel[0],
-                                          panel[1],
-                                          panel[1]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # top nor bottom from top markers pegs inverted
-        print(transform_pegs_bottom_inverted(panel[0],
-                                             panel[0],
-                                             panel[1]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # bottom nor top from top markers inverted
-        print(transform_pegs_bottom_inverted(panel[1],
-                                             panel[0],
-                                             panel[0]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # bottom nor top from bottom markers inverted
-        print(transform_pegs_bottom_inverted(panel[1],
-                                             panel[1],
-                                             panel[0]))
-    print()
-    for panel in metro_control_panel_001_pegboard:
-        # top nor bottom from bottom markers inverted
-        print(transform_pegs_bottom_inverted(panel[0],
-                                             panel[1],
-                                             panel[1]))
+    print(" " * 27 + (" " * 8).join(f"col {x: <2d}" for x in range(1, 9)))
+
+    # Iterate through all combinations of the peg groupings.
+    # Bits are represented by peg locations.
+    # A nor mask is made from the marker locations from one of the peg groupings.
+    for i, pegs1 in enumerate(peg_groups):
+        mask_1 = bools_to_nor_mask(pegs1.markers)
+        inverted_1 = invert_bools(pegs1.pegs)
+
+        for j, pegs2 in enumerate(peg_groups):
+            mask_2 = bools_to_nor_mask(pegs2.markers)
+            inverted_2 = invert_bools(pegs2.pegs)
+
+            print(f"{pegs1.name} x {pegs2.name}", end=" =  ")
+
+            print(bools_to_ascii_str(mask_1(pegs1.pegs, pegs2.pegs), red_text), end="   ")  # col 1
+            print(bools_to_ascii_str(mask_2(pegs1.pegs, pegs2.pegs), red_text), end="   ")  # col 2
+
+            print(bools_to_ascii_str(mask_1(pegs1.pegs, inverted_2), red_text), end="   ")  # col 3
+            print(bools_to_ascii_str(mask_2(pegs1.pegs, inverted_2), red_text), end="   ")  # col 4
+
+            print(bools_to_ascii_str(mask_1(inverted_1, pegs2.pegs), red_text), end="   ")  # col 5
+            print(bools_to_ascii_str(mask_2(inverted_1, pegs2.pegs), red_text), end="   ")  # col 6
+
+            print(bools_to_ascii_str(mask_1(inverted_1, inverted_2), red_text), end="   ")  # col 7
+            print(bools_to_ascii_str(mask_2(inverted_1, inverted_2), red_text), end="   ")  # col 8
+            print()
+        print()
+
+    # Reverse each peg group
+    for i, peg_group in enumerate(peg_groups):
+        peg_groups[i] = PegGroup(
+            name=peg_group.name, pegs=tuple(reversed(peg_group.pegs)), markers=tuple(reversed(peg_group.markers))
+        )
+
+    for i, pegs1 in enumerate(peg_groups):
+        mask_1 = bools_to_nor_mask(pegs1.markers)
+        inverted_1 = invert_bools(pegs1.pegs)
+
+        for j, pegs2 in enumerate(peg_groups):
+            mask_2 = bools_to_nor_mask(pegs2.markers)
+            inverted_2 = invert_bools(pegs2.pegs)
+
+            print(f"{pegs1.name} x {pegs2.name}", end=" =  ")
+
+            print(bools_to_ascii_str(mask_1(pegs1.pegs, pegs2.pegs), red_text), end="   ")  # col 1
+            print(bools_to_ascii_str(mask_2(pegs1.pegs, pegs2.pegs), red_text), end="   ")  # col 2
+
+            print(bools_to_ascii_str(mask_1(pegs1.pegs, inverted_2), red_text), end="   ")  # col 3
+            print(bools_to_ascii_str(mask_2(pegs1.pegs, inverted_2), red_text), end="   ")  # col 4
+
+            print(bools_to_ascii_str(mask_1(inverted_1, pegs2.pegs), red_text), end="   ")  # col 5
+            print(bools_to_ascii_str(mask_2(inverted_1, pegs2.pegs), red_text), end="   ")  # col 6
+
+            print(bools_to_ascii_str(mask_1(inverted_1, inverted_2), red_text), end="   ")  # col 7
+            print(bools_to_ascii_str(mask_2(inverted_1, inverted_2), red_text), end="   ")  # col 8
+            print()
+        print()

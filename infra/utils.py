@@ -1,10 +1,27 @@
 """Utility functions."""
-
-from typing import Iterable, List, Sequence, Tuple, TypeVar, Union
+import types
+from typing import Iterable, List, Sequence, Tuple, TypeVar, Union, Type, Any, Callable, cast, Collection
 
 T = TypeVar("T")
 Rotatable = Union[Sequence[T], str]
 Indexable = Union[List[T], Union[T], str]
+
+
+def chunked(items: Sequence[T], n: int) -> Sequence[Sequence[T]]:
+    """
+    Yield successive n-sized chunks from lst.
+    The last chunk is trunkated as needed.
+
+    :param items: A collection of things to be chunked.
+    :param n: The size of each chunk.
+
+     >>> list(chunked([1, 2, 3, 4, 5], 2))
+     [[1, 2], [3, 4], [5]]
+     >>> list(chunked((1, 1, 1, 1, 1), 2))
+     ((1), (1), (1))
+    """
+    # noinspection PyArgumentList
+    return type(items)(type(items)(items[i : i + n]) for i in range(0, len(items), n))
 
 
 def rotate_left(sequence: Rotatable, n: int) -> Rotatable:
