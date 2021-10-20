@@ -98,11 +98,11 @@ def bools_to_nor_mask(masking_bools: Collection[bool]) -> NorMask:
     def left(*args) -> bool:
         return args[0]
 
-    def nor_mask_function(left_: Collection[bool], right_: Collection[bool]) -> Tuple[bool]:
-        assert len(left_) == len(right_) == len(masking_bools)
+    def nor_mask_function(a: Collection[bool], b: Collection[bool]) -> Tuple[bool]:
+        assert len(a) == len(b) == len(masking_bools)
 
-        operators = [nor if bit else left for bit in masking_bools]
-        return tuple(operator(l, r) for operator, l, r in zip(operators, left_, right_))
+        operators = (nor if bit else left for bit in masking_bools)
+        return tuple(operator(l, r) for operator, l, r in zip(operators, a, b))
 
     return nor_mask_function
 
