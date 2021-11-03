@@ -42,30 +42,26 @@ if __name__ == "__main__":
 
     # Following are some tests applying a nor mask to various combinations of pegs.
 
-    peg_group_names = (("pegs[1,1]", "pegs[1,2]"),
-                       ("pegs[3,1]", "pegs[3,2]"),
-                       ("pegs[4,1]", "pegs[4,2]"))
+    peg_group_names = (("pegs[1,1]", "pegs[1,2]"), ("pegs[3,1]", "pegs[3,2]"), ("pegs[4,1]", "pegs[4,2]"))
 
     # Flatten the peg groupings for easier handling.
     # pegs[1,1]                 pegs[3,1]    pegs[4,1]
     # pegs[1,2]                 pegs[3,2]    pegs[4,2]
-    peg_groups = []
-    for i, panels in enumerate(metro_control_panel_001_pegboard):
-        for j, peg_str in enumerate(panels):
-            peg_group = PegGroup(
-                # Correcting for the blank panel
-                name=peg_group_names[i][j],
-                pegs=invert_bools(matching_elements(peg_str, "E")),
-                markers=matching_elements(peg_str, "M"),
-            )
-            peg_groups.append(peg_group)
+
+    peg_groups = [
+        PegGroup(
+            name=peg_group_names[i][j],
+            pegs=invert_bools(matching_elements(peg_str, "E")),
+            markers=matching_elements(peg_str, "M"),
+        )
+        for i, panels in enumerate(metro_control_panel_001_pegboard)
+        for j, peg_str in enumerate(panels)
+    ]
 
     zeros = [False] * 24
 
-
     def red_text(text: str):
         return colored(text, "red")
-
 
     # Some labeling to help identify interesting results.
     print()

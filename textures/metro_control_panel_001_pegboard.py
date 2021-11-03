@@ -71,13 +71,10 @@ def invert_bools(bits: Iterable[bool]) -> Tuple[bool]:
 
 def bools_to_nor_mask(masking_bools: Collection[bool]) -> NorMask:
     """
-    Creates an elementwise function that can called with two lists of booleans
-    of the same shape.
-    How the returned nor mask function is meant to be used:
-    (A, B, and C are lists; * is the nor mask function)
-    A * B = C
-    For C[n] the value A[n] is given where masking_bools[n] is False
-    and A[n] NOR B[n] is given where masking_bools[n] is True.
+    Returns a sequence of binary functions. Depending on
+    masking_bools[i], each function returns either nor(a,b) if True, or left(a,b):=a otherwise.
+
+    E.g., bools_to_nor_mask((True, False)) returns (nor, left)
 
     :param masking_bools: Bools that determine if the function should NOR or not.
     :return: Elementwise operator.

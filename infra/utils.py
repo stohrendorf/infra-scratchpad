@@ -20,8 +20,10 @@ def chunked(items: Sequence[T], n: int) -> Sequence[Sequence[T]]:
      >>> list(chunked((1, 1, 1, 1, 1), 2))
      ((1), (1), (1))
     """
+    if n < 1:
+        raise ValueError("n must be greater than 0")
     # noinspection PyArgumentList
-    return type(items)(type(items)(items[i : i + n]) for i in range(0, len(items), n))
+    return type(items)(type(items)(items[i : i + int(n)]) for i in range(0, len(items), int(n)))
 
 
 def rotate_left(sequence: Rotatable, n: int) -> Rotatable:

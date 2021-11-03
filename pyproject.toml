@@ -6,7 +6,7 @@ authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-termcolor = "^1.1.0"
+termcolor = "*"
 
 [tool.poetry.dev-dependencies]
 black = "*"
