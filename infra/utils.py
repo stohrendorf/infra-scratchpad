@@ -7,6 +7,25 @@ Rotatable = Union[Sequence[T], str]
 Indexable = Union[List[T], Union[T], str]
 
 
+def chunked(items: Sequence[T], n: int) -> Sequence[Sequence[T]]:
+    """
+    Yield successive n-sized chunks from lst.
+    The last chunk is trunkated as needed.
+
+    :param items: A collection of things to be chunked.
+    :param n: The size of each chunk.
+
+     >>> list(chunked([1, 2, 3, 4, 5], 2))
+     [[1, 2], [3, 4], [5]]
+     >>> list(chunked((1, 1, 1, 1, 1), 2))
+     ((1), (1), (1))
+    """
+    if n < 1:
+        raise ValueError("n must be greater than 0")
+    # noinspection PyArgumentList
+    return type(items)(type(items)(items[i : i + int(n)]) for i in range(0, len(items), int(n)))
+
+
 def rotate_left(sequence: Rotatable, n: int) -> Rotatable:
     """
     Rotate a sequence to the left.
