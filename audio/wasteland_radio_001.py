@@ -1,4 +1,4 @@
-"""The morse code found in wasteland_radio_morse.wav."""
+"""The morse code found in random/wasteland_radio_001.wav."""
 
 from infra.encodings.morse import decode_morse
 

@@ -1,4 +1,4 @@
-"""The morse code found in central_projector_morse.wav."""
+"""The morse code found in video/video_1.wav."""
 
 from infra.encodings.morse import decode_morse
 
