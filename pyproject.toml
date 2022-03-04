@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "infra-scratchpad"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+description = "collection of scripts related to the infra arg (https://stalburg.net/ARG_Portal)"
+authors = []
 
 [tool.poetry.dependencies]
 python = "^3.8"
