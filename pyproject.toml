@@ -17,8 +17,10 @@ flake8 = "*"
 flake8-black = "*"
 flake8-coding = "*"
 flake8-commas = "*"
-flake8-import-order = "*"
+flake8-isort = "*"
 flake8-quotes = "*"
+
+toml = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
