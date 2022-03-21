@@ -1,7 +1,6 @@
 from typing import Tuple, Dict
 
 from textures.wasteland_notes_001 import (
-    MESSAGE_LINE_SEPARATOR,
     solve_wasteland_notes_001,
     wasteland_notes_001_key,
     wasteland_notes_001,
@@ -69,6 +68,6 @@ if __name__ == "__main__":
                 print("---------------------------------------------------")
                 for i in range(36):
                     x, y = mod_xy(*_find_square_co(i + 1))
-                    print(decoded[mod_x(x)][mod_y(y)].replace(MESSAGE_LINE_SEPARATOR, " "))
+                    print(" ".join(decoded[mod_x(x)][mod_y(y)]))
 
     print("unreferenced key chars", _clean_unreferenced_key_chars(wasteland_notes_001_key, wasteland_notes_001))

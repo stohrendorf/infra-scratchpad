@@ -253,7 +253,7 @@ wasteland_notes_001: Notes = (
 )
 
 
-def _decode_wasteland_message(key: Dict[str, str], message: Iterable[str], with_code: bool = False) -> str:
+def _decode_wasteland_message(key: Dict[str, str], message: Iterable[str], with_code: bool = False) -> Tuple[str, ...]:
     def decode_word(word: str) -> str:
         if "." not in word:
             return word
@@ -265,11 +265,10 @@ def _decode_wasteland_message(key: Dict[str, str], message: Iterable[str], with_
         except IndexError:
             return f"[{word}]"
 
-    lines = MESSAGE_LINE_SEPARATOR.join("".join(map(decode_word, line.split())).replace("#", " ") for line in message)
-    return lines
+    return tuple("".join(map(decode_word, line.split())).replace("#", " ") for line in message)
 
 
-def solve_wasteland_notes_001():
+def solve_wasteland_notes_001() -> Tuple[Tuple[Tuple[str, ...], ...], ...]:
     return tuple(
         tuple(_decode_wasteland_message(wasteland_notes_001_key, note) for note in row) for row in wasteland_notes_001
     )
@@ -279,4 +278,4 @@ if __name__ == "__main__":
     decoded = solve_wasteland_notes_001()
     for row in decoded:
         for decoded_note in row:
-            print(decoded_note)
+            print(MESSAGE_LINE_SEPARATOR.join(decoded_note))
