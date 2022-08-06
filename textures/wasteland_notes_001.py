@@ -1,5 +1,4 @@
 """The solution of https://stalburg.net/Wasteland_notes."""
-from collections import defaultdict
 from typing import Dict, Iterable, Tuple
 
 from other.bunker_computer import bunker_computer_code_2_solution
