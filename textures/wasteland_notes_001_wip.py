@@ -1,10 +1,10 @@
-from typing import Tuple, Dict
+from typing import Dict, Tuple
 
 from textures.wasteland_notes_001 import (
-    solve_wasteland_notes_001,
-    wasteland_notes_001_key,
-    wasteland_notes_001,
     Notes,
+    solve_wasteland_notes_001,
+    wasteland_notes_001,
+    wasteland_notes_001_key,
 )
 
 _magic_square = (
