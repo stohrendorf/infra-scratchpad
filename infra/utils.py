@@ -15,22 +15,22 @@ def rotate_left(sequence: Rotatable, n: int) -> Rotatable:
     :param n: The amount of rotation.
     :return: The rotated sequence.
 
-    >>> rotate_left("hello", 2)
-    'llohe'
+    >>> rotate_left("12345", 2)
+    '34512'
     """
     return sequence[n:] + sequence[:n]
 
 
 def rotate_right(sequence: Rotatable, n: int) -> Rotatable:
     """
-    Rotate a sequence to the right.
+    Rotate a `Rotatable` to the right.
 
     :param sequence: The sequence to rotate.
     :param n: The amount of rotation.
     :return: The rotated sequence.
 
-    >>> rotate_right("hello", 2)
-    'lohel'
+    >>> rotate_right("12345", 2)
+    '45123'
     """
     return rotate_left(sequence, len(sequence) - n)
 
