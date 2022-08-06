@@ -3,6 +3,7 @@
 from typing import Dict, Tuple
 
 from infra.ciphers.transposition import transposed
+from infra.output import section
 from other.body_message import body_code
 
 bunker_computer_code_1 = (
@@ -137,22 +138,26 @@ def _count_usages(data: Tuple[Tuple[str, ...], ...]) -> Dict[str, int]:
 
 
 def _print_non_unique_code_usage_part_3():
-    for code, usage_count in _count_usages(bunker_computer_code_1).items():
-        if usage_count != 1:
-            column, row = code.split(".")
-            print(code, bunker_computer_code_1[int(row) - 1][int(column) - 1], usage_count)
+    with section("non-unique code usages") as s:
+        for code, usage_count in _count_usages(bunker_computer_code_1).items():
+            if usage_count != 1:
+                column, row = code.split(".")
+                s.print(f"{code} {bunker_computer_code_1[int(row) - 1][int(column) - 1]} {usage_count}")
 
 
 if __name__ == "__main__":
-    print(_decrypt_bunker_computer_code_2())
+    with section("bunker computer code section 2") as s:
+        s.print(_decrypt_bunker_computer_code_2())
     _print_non_unique_code_usage_part_3()
-    for column in transposed(bunker_computer_code_1):
-        print("".join(word[0] for word in column))
+    with section("first column letters") as s:
+        for column in transposed(bunker_computer_code_1):
+            s.print("".join(word[0] for word in column))
 
     def _get_word(co: str):
         x, y = co.split(".")
         return bunker_computer_code_1[int(y) - 1][int(x) - 1]
 
-    for row in bunker_computer_code_3:
-        for column in row:
-            print(" ".join(map(_get_word, column)))
+    with section("bunker computer code section 3") as s:
+        for row in bunker_computer_code_3:
+            for column in row:
+                s.print(" ".join(map(_get_word, column)))

@@ -1,6 +1,7 @@
 """Solution of https://stalburg.net/Office_monitor_code."""
 
 from infra.encodings.binary import binary_decode
+from infra.output import section
 from infra.utils import rotate_right
 
 # codes start with the first complete code, the last one is usually wrapped
@@ -31,4 +32,5 @@ if __name__ == "__main__":
             5,
         ),
     )
-    print(result)
+    with section("computer_screen_skin8 solution") as s:
+        s.print(result)

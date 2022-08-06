@@ -1,6 +1,7 @@
 """The solution of sign_07_skin10.vtf."""
 
 from infra.encodings.binary import binary_decode
+from infra.output import section
 
 sign_07_skin10 = (
     "01110000 01110101",
@@ -14,5 +15,6 @@ sign_07_skin10 = (
 )
 
 if __name__ == "__main__":
-    for entry in sign_07_skin10:
-        print(binary_decode(entry))
+    with section("sign_07_skin10 solution") as s:
+        for entry in sign_07_skin10:
+            s.print(binary_decode(entry))

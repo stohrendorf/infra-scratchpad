@@ -2,6 +2,8 @@
 
 from typing import Tuple, Union
 
+from infra.output import section
+
 hartman_woodbox_001 = (1, "M", 22, 2, "Y")
 hartman_woodbox_002 = (12, 2, "B", 1, 13, 17)
 
@@ -23,5 +25,7 @@ hartman_woodbox_001_solution = _decrypt_hartman_woodbox(hartman_woodbox_001)
 hartman_woodbox_002_solution = _decrypt_hartman_woodbox(hartman_woodbox_002)
 
 if __name__ == "__main__":
-    print(hartman_woodbox_001_solution)
-    print(hartman_woodbox_002_solution)
+    with section("emily") as s:
+        s.print(hartman_woodbox_001_solution)
+    with section("albert") as s:
+        s.print(hartman_woodbox_002_solution)

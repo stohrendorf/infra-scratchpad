@@ -2,6 +2,7 @@
 
 from typing import Dict, Tuple
 
+from infra.output import section
 from textures.scientific_table_001_skin3 import solve_g1_g2_g3
 
 body_code = {
@@ -45,4 +46,5 @@ def _decode_body_message(key: Dict[str, str], message: Tuple[str, ...]) -> str:
 
 
 if __name__ == "__main__":
-    print(_decode_body_message(body_code, body_message))
+    with section("body code") as s:
+        s.print(_decode_body_message(body_code, body_message))

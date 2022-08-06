@@ -1,28 +1,12 @@
-from typing import Dict, Tuple
+from typing import Dict
 
+from infra.output import section
 from textures.wasteland_notes_001 import (
     Notes,
     solve_wasteland_notes_001,
     wasteland_notes_001,
     wasteland_notes_001_key,
 )
-
-_magic_square = (
-    (6, 32, 3, 34, 35, 1),
-    (7, 11, 27, 28, 8, 30),
-    (19, 14, 16, 15, 23, 24),
-    (18, 20, 22, 21, 17, 13),
-    (25, 29, 10, 9, 26, 12),
-    (36, 5, 33, 4, 2, 31),
-)
-
-
-def _find_square_co(n: int) -> Tuple[int, int]:
-    for x in range(6):
-        for y in range(6):
-            if _magic_square[y][x] == n:
-                return x, y
-    raise KeyError
 
 
 def _count_code_usage(notes: Notes) -> Dict[str, int]:
@@ -52,22 +36,11 @@ def _clean_unreferenced_key_chars(key: Dict[str, str], notes: Notes) -> Dict[str
 if __name__ == "__main__":
     decoded = solve_wasteland_notes_001()
 
-    modifiers = (
-        lambda x: x,
-        lambda x: 5 - x,
-    )
+    with section("wasteland_notes_001 solution") as s:
+        for row_index, row in enumerate(decoded):
+            for column_index, note in enumerate(row):
+                with section(f"column {column_index+1}, row {row_index+1}") as s2:
+                    s2.print("\n".join(note))
 
-    modifiers_xy = (
-        lambda x, y: (x, y),
-        lambda x, y: (y, x),
-    )
-
-    for mod_x in modifiers:
-        for mod_y in modifiers:
-            for mod_xy in modifiers_xy:
-                print("---------------------------------------------------")
-                for i in range(36):
-                    x, y = mod_xy(*_find_square_co(i + 1))
-                    print(" ".join(decoded[mod_x(x)][mod_y(y)]))
-
-    print("unreferenced key chars", _clean_unreferenced_key_chars(wasteland_notes_001_key, wasteland_notes_001))
+    with section("wasteland_notes_001 unreferenced key chars") as s2:
+        s2.print(_clean_unreferenced_key_chars(wasteland_notes_001_key, wasteland_notes_001).__str__())

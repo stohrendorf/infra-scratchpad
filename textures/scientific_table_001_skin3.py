@@ -3,6 +3,7 @@
 from typing import Dict, Iterable, Sequence, Tuple
 
 from infra.dict import find_string_chars
+from infra.output import section
 
 scientific_table_001_skin3 = {
     # G3 is G0 in the texture, it's different here to avoid special handling with coordinates
@@ -80,5 +81,6 @@ def solve_g1_g2_g3() -> Dict[str, str]:
 
 
 if __name__ == "__main__":
-    for key, value in solve_g1_g2_g3().items():
-        print(key, value)
+    with section("scientific_table_001_skin3 solution") as s:
+        for key, value in solve_g1_g2_g3().items():
+            s.print(f"{key} {value}")

@@ -2,6 +2,7 @@
 
 from typing import Tuple, Union
 
+from infra.output import section
 from other.bunker_computer import bunker_computer_code_2_solution
 
 PlateValue = Union[str, int]
@@ -48,8 +49,9 @@ control_panel_puzzle_ultimate_alternative_solution_1 = _decrypt_control_panel_pu
 control_panel_puzzle_ultimate_alternative_solution_2 = _decrypt_control_panel_puzzle_ultimate_column_selection(True)
 
 if __name__ == "__main__":
-    for column in control_panel_puzzle_ultimate_alternative_solution_1:
-        print(column)
-    print()
-    for column in control_panel_puzzle_ultimate_alternative_solution_2:
-        print(column)
+    with section("solution 1") as s:
+        for column in control_panel_puzzle_ultimate_alternative_solution_1:
+            s.print(column)
+    with section("solution 2") as s:
+        for column in control_panel_puzzle_ultimate_alternative_solution_2:
+            s.print(column)

@@ -1,6 +1,7 @@
 """The solution for the code found in keypad_003.vtf."""
 
 from infra.encodings.binary import binary_decode
+from infra.output import section
 
 keypad_003 = (
     "01001110 01001111 01010100",
@@ -12,5 +13,6 @@ keypad_003 = (
 )
 
 if __name__ == "__main__":
-    for entry in keypad_003:
-        print(binary_decode(entry))
+    with section("keypad_003 solution") as s:
+        for entry in keypad_003:
+            s.print(binary_decode(entry))

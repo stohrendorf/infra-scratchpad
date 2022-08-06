@@ -1,6 +1,7 @@
 """The morse code found in Open Sewer radio_broken_001.wav."""
 
 from infra.encodings.morse import decode_morse
+from infra.output import section
 
 radio_broken_001 = (
     # start 0:20, end ...
@@ -17,5 +18,6 @@ radio_broken_001 = (
 
 
 if __name__ == "__main__":
-    for sentence in decode_morse(radio_broken_001):
-        print(sentence)
+    with section("radio_broken_001 solution") as s:
+        for sentence in decode_morse(radio_broken_001):
+            s.print(sentence)

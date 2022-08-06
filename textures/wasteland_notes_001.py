@@ -1,6 +1,7 @@
 """The solution of https://stalburg.net/Wasteland_notes."""
 from typing import Dict, Iterable, Tuple
 
+from infra.output import section
 from other.bunker_computer import bunker_computer_code_2_solution
 from textures.hartman_woodbox import hartman_woodbox_002_solution
 
@@ -275,6 +276,8 @@ def solve_wasteland_notes_001() -> Tuple[Tuple[Tuple[str, ...], ...], ...]:
 
 if __name__ == "__main__":
     decoded = solve_wasteland_notes_001()
-    for row in decoded:
-        for decoded_note in row:
-            print(MESSAGE_LINE_SEPARATOR.join(decoded_note))
+    with section("wasteland_notes_001 solution") as s:
+        for row_index, row in enumerate(decoded):
+            for col_index, decoded_note in enumerate(row):
+                with section(f"row {row_index+1}, column {col_index+1}") as s2:
+                    s2.print(MESSAGE_LINE_SEPARATOR.join(decoded_note))

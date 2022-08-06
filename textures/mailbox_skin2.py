@@ -1,6 +1,7 @@
 """The solution for the code found in mailbox_skin2.vtf."""
 
 from infra.encodings.binary import binary_decode
+from infra.output import section
 from infra.string import insert_spaces
 
 mailbox_skin2 = (
@@ -14,5 +15,6 @@ mailbox_skin2 = (
 )
 
 if __name__ == "__main__":
-    for entry in mailbox_skin2:
-        print(binary_decode(insert_spaces(entry, 8)))
+    with section("mailbox_skin2 solution") as s:
+        for entry in mailbox_skin2:
+            s.print(binary_decode(insert_spaces(entry, 8)))

@@ -1,6 +1,7 @@
 """The solution for the code found in control_panel_007_screens_skin1.vtf."""
 
 from infra.encodings.binary import binary_decode
+from infra.output import section
 
 control_panel_007_screens_skin1 = (
     "01101000 01100101 01101100 01110000 00100000 01101101",
@@ -13,5 +14,6 @@ control_panel_007_screens_skin1 = (
 )
 
 if __name__ == "__main__":
-    for entry in control_panel_007_screens_skin1:
-        print(binary_decode(entry))
+    with section("control_panel_007_screens_skin1 solution") as s:
+        for entry in control_panel_007_screens_skin1:
+            s.print(binary_decode(entry))

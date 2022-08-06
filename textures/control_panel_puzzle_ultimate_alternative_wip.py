@@ -1,5 +1,7 @@
 from typing import Any, List, Set
 
+from infra.output import section
+
 _DIM_X = 4
 _DIM_Y = 5
 _RIGHT = ">"
@@ -119,10 +121,11 @@ def find_paths():
             lights = make_lights()
             find_paths_rec(x0, y0, lights, "", solutions)
 
-    print(len(solutions), "solutions of ", _DIM_X * _DIM_Y * (_DIM_X * _DIM_Y - 1), " total start/end points")
-    for solution in solutions:
-        print(solution)
-        print()
+    with section("path connecting all possible grid points") as s:
+        s.print(f"{len(solutions)} solutions of {_DIM_X * _DIM_Y * (_DIM_X * _DIM_Y - 1)} total start/end points")
+        for i, solution in enumerate(solutions):
+            with section(f"path {i+1}") as s2:
+                s2.print(solution)
 
 
 if __name__ == "__main__":
